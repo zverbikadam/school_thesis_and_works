@@ -1,0 +1,402 @@
+\chapter{Implementácia aplikácie eAurela}
+Celková implementácia všetkých častí aplikácie eAurela vychádza zo špecifikácie požiadaviek a návrhu štruktúry. Sú tu popísané jednotlivé časti aplikácie, ich funkcionalita a implementácia. Prvá časť tejto kapitoly sa bude venovať používateľskému rozhraniu, následne bude vysvetlené, ako funguje navigácia v aplikácií. Ďalšia časť popisuje komunikáciu so serverom, získavanie a uchovávanie dát. Na záver je v kapitole popísaný dizajn aplikácie a zobrazenie dát pomocou dizajnových prvkov a pomocou grafov z knižnice \textit{recharts}.
+\section{Používateľské rozhranie}
+Všetky časti aplikácie, ktoré spolu vytvárajú používateľské rozhranie (UI), sú implementované v súlade s navrhnutou štruktúrou v časti \ref{structure}. Pomocou týchto častí používateľ pracuje a komunikuje s aplikáciou. Každá časť aplikácie je samostatný reactový komponent, ktorý sa môže skladať aj z viacerých komponentov. V princípe rozdeľujú tieto komponenty aplikáciu na tri časti:
+\begin{itemize}
+\item prístup k dátam,
+\item prezentácia dát používateľovi,
+\item spravovanie systému (iba pre administrátorov).
+\end{itemize}
+\subsubsection*{Prístup k dátam}
+Pre prístup k dátam slúžia komponenty \textit{Home} a \textit{Appilist}. Komponent \textit{Home} je prvý vykreslený komponent po spustení aplikácie eAurela. Po prihlásení do systému sa zobrazí komponent \textit{Applist} (viď obr. \ref{fig:HomeUI} a obr. \ref{fig:ApplistUI}).
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/HomeUI.png}
+    \centering
+    \caption{Prihlasovacia obrazovka (komponent \textit{Home})}
+    \label{fig:HomeUI}
+\end{figure}
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/ApplistUI.png}
+    \centering
+    \caption{Obrazovka pre výber aplikácie (komponent \textit{Applist})}
+    \label{fig:ApplistUI}
+\end{figure}
+\subsubsection*{Prezentácia dát používateľovi}
+Po výbere aplikácie zo spoločnosti v komponente \textit{Applist} sa vykresľuje komponent \textit{Sectors}. V tomto komponente si používateľ môže prezerať poslednú nameranú hodnotu zo senzorov v danom sektore, alebo si môže zvoliť vykreslenie grafu, ktorý zobrazuje krivky zo všetkých senzorov za určité obdobie. Tieto dve časti komponentu \textit{Sectors} je možné vidieť na obrázkoch obr. \ref{fig:SectorsUI}. a obr. \ref{fig:GraphsUI}.
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/SectorsUI.png}
+    \centering
+    \caption{Posledné namerané hodnoty v oblasti \textit{Letné sídlo} (komponent \textit{Sectors})}
+    \label{fig:SectorsUI}
+\end{figure}
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/GraphsUI.png}
+    \centering
+    \caption{Vykreslenie grafu z oblasti \textit{Letné sídlo} (komponent \textit{Sectors})}
+    \label{fig:GraphsUI}
+\end{figure}
+\subsubsection*{Spravovanie systému}
+Z funkčých požiadaviek R02 a R04 vyplýva, že administrátori systému budú mať možnosť spravovať systém cez aplikáciu eAurela. V prípade, že je používateľ na serveri pre autorizáciu uvedený ako administrátor, v komponente \textit{Applist} po kliknutí na \textit{Možnosti} sa mu zobrazí možnosť prejsť do časti spravovania tohto serveru. Podobne aj v komponente \textit{Sectors} sa používateľovi zobrazí možnosť spravovania danej aplikácie v prípade, že má na serveri aplikácie uvedené administrátorské oprávnenia.
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/AuthAdminUI.png}
+    \centering
+    \caption{Spravovanie serveru pre autorizáciu (komponent \textit{AuthAdministration})}
+    \label{fig:AuthAdminUI}
+\end{figure}
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/ManageAdminUI.png}
+    \centering
+    \caption{Spravovanie konkrétnej aplikácie (komponent \textit{ManageAdministration})}
+    \label{fig:ManageAdminUI}
+\end{figure}
+\section{Navigácia v aplikácií}\label{navigation}
+Jadrom celej aplikácie je knižnica React Router (https://github.com/ReactTraining/react-router). Tá zabezpečuje navigáciu medzi oknami (komponentami) v aplikácii eAurela. Táto knižnica slúži pre vytvorenie navigácie v aplikáciách naprogramovaných vo frameworku React. V jedno-oknových aplikáciach existuje iba jedna HTML stránka. Táto stránka je znovu použitá pri vykreslení rôznych komponentov v závislosti od navigácie. V knižnici React router sú tri primárne kategórie komponentov:
+\begin{itemize}
+\item smerovače (routers), ako <BrowserRouter> a <HashRouter>,
+\item porovnávače (route matchers), ako <Route> a <Switch>,
+\item samotná navigácia (navigation), ako <Link>, <NavLink> a <Redirect>.
+\end{itemize}
+\subsubsection*{Smerovače}
+Sada \textit{react-router-dom} sa používa v internetových projektoch a poskytuje komponenty \textit{BrowserRouter} a \textit{HashRouter}. V aplikácií eAurela je použitá práve sada react-router-dom. Hlavný rozdiel medzi komponentami \textit{BrowserRouter} a \textit{HashRouter} je spôsob ako pracujú s URL adresou a ako komunikujú s internetovým serverom (Nodejs serverom). \textit{BrowserRouter} používa regulárny tvar URL adresy (tak ako ho je možné vidieť v prehliadači). Tento spôsob práce s URL adresou by bol dostačujúci v prípade, že by bola aplikácia zobrazovaná iba v prehliadači. Vzhľadom na to, že aplikácia bude slúžiť aj ako desktopová aplikácia, bolo výhodnejšie použiť práve \textit{HashRouter}. Ten aktuálnu URL adresu ukladá ako mriežkovú časť (hash portion), teda URL adresa môže vyzerať napríklad \textbf{http://priklad.com/\#/hladana/stranka}. Nakoľko mriežka nie je nikdy posielaná na server, netreba server špeciálne konfigurovať a navigácia bude fungovať v internetovom prehliadači a aj v desktopovej aplikácií. Pre správne použitie smerovača, je potrebné, aby bol umiestnený v jadre komponentovej hierarchie.
+\subsubsection*{Porovnávače}
+Existujú dva komponenty pre porovnávanie: \textit{Switch} a \textit{Route}. Keď je vykreslený \textit{Switch}, prehľadá všetkých potomkov \textit{Route}, kým nenájde jedného, ktorého adresa sa zhoduje s aktuálnou URL adresou. Ak ho nájde, vykreslí ho a všetky ostatné komponenty ignoruje. Ak nenájde žiadnu zhodu, nevykreslí nič (null).
+\subsubsection*{Navigácia}
+React Router poskytuje \textit{Link} komponent na vytváranie odkazov v aplikácií. Kedykoľvek je vykreslený \textit{Link}, vykreslí sa vlastne HTML tag <a>. Komponent \textit{NavLink} je špeciálny druh \textit{Link} komponentu, ktorému sa môže nastaviť vlastnosť \textit{active} v prípade, že sa cesta zhoduje s URL adresou.
+Kedykoľvek treba vynútiť navigáciu, môže sa použiť komponent \textit{Redirect}. Keď sa vykreslí, bude navigovať podľa jeho vlastnosti \textbf{to} \cite{react-router}. Použitie komponentu \textit{Redirect} je ukázané a popísané v kóde \ref{lst:ProtectedRoute}.
+\begin{lstlisting}[caption={Zjednodušená ukážka použitia react-router-dom komponentov v aplikácií}, label={lst:Routing}]
+<HashRouter>
+    <div className="App">
+        <Switch>
+            <Route exact path={"/"} component={Home} />
+            <ProtectedRoute exact path={"/applist"}
+                component={AppList}
+             />  
+            <ProtectedAppRoute exact path={"/sectors"}
+                component={Sectors}
+            />
+        </Switch>
+     </div>
+</HashRouter>
+\end{lstlisting}
+\subsubsection*{Vytvorenie chránenej cesty}
+Ak nastane situácia, kedy je ku komponentu možné pristúpiť iba v určitom prípade (napríklad používateľ musí byť prihlásený, aby získal prístup k určitým častiam aplikácie), treba použiť tzv. chránenú cestu (\textit{ProtectedRoute}). Keďže React Router taký komponent neposkytuje a do aplikácie majú prístup iba prihlásený používatelia, je potrebné chránenú cestu vytvoriť. Chránená cesta sa vytvorí modifikovaním už existujúceho komponentu \textit{Route}. Vytváranie chránenej cesty je ukázané v kóde \ref{lst:ProtectedRoute}.
+
+\begin{lstlisting}[caption={Vytvorenie chránenej cesty z komponentu <Route>}, label={lst:ProtectedRoute}]
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+export const ProtectedRoute = ({ component: Component,
+                                            path, ...rest }) => {
+    // v premennej sa uchováva stav, či je používateľ prihlásený
+    const isAuth = sessionStorage.getItem('isLoggedIn'); 
+    return (
+        <Route    // vykreslenie klasického komponentu <Route>
+            path={path}
+            {...rest}
+            render={props => {
+                return isAuth ?
+                    <Component {...props} {...rest} /> 
+    /* ak používateľ nie je prihlásený, vykreslí sa <Redirect>,
+    ktorý používateľa presmeruje na obrazovku Home */
+                    : <Redirect to="/" />
+            }} />
+    )
+}
+\end{lstlisting}
+
+\section{Získavanie a uchovávanie dát zo servera}
+Všetky dáta, ktoré aplikácia eAurela získava a prezentuje používateľovi, získava zo vzdialeného servera. Prístup k údajom na serveri zabezpečuje REST API (časť \ref{API}). Aplikácia neponúka ukladanie dát pre neskoršie zobrazenie, ale vždy zobrazuje aktuálne dáta (funkčné požiadavky R06 a R08).
+\subsection{Získavanie dát zo servera}
+Existuje viacero spôsobov, ako komunikovať so vzdialeným serverom v React aplikácií. Väčšina vyžaduje dodatočnú inštaláciu knižnice určenej pre túto komunikáciu. V aplikácii eAurela však bol použitý spôsob priamo dostupný vo frameworku React, bez nutnosti inštalovať dodatočnú knižnicu. Pre túto komunikáciu slúži metóda \textit{fetch}. Táto metóda preberá minimálne jeden parameter a to práve URL adresu servera. V aplikácii eAurela sa odovzdávajú tejto metóde vždy 2 parametre. Prvý parameter je textový reťazec a predstavuje URL adresu servera. Druhý parameter je objekt, ktorého povinná vlastnosť je metóda (method). Tu sa určí typ metódy (post, get, put alebo delete). Ďalej sa v tomto objekte môže zadefinovať hlavička (headers) a telo (body) požiadavku. Tieto vlastnosti nie sú povinné a zadávajú sa podľa toho, ako je to zadefinované na strane servera. Obsahujú informácie, ktoré sú nevyhnutné pre správne odoslanie požiadavku. V hlavičke to môžu byť napríklad prihlasovacie údaje používateľa, JWT token pre autorizovanie, alebo aj meno aplikácie, do ktorej sa používateľ snaží prihlásiť. Pri vytváraní alebo upravovaní používateľa, spoločnosti, senzora a podobne, sa v tele požiadavku odošle táto informácia ako JSON objekt konvertovaný na textový reťazec.
+\begin{lstlisting}[caption={Príklad požiadavky pri vytváraní nového používateľa}, label={requestBody}]
+body: JSON.stringify({
+                    login: this.state.login,
+                    password: sha256(this.state.password),
+                    firstname: this.state.firstname,
+                    surname: this.state.surname,
+                    isAdmin: this.state.isAdmin,
+                    enabled: this.state.enabled,
+                    Companies: this.state.Companies
+                })
+\end{lstlisting}
+\begin{lstlisting}[caption={Ukážka metódy fetch (zjednodušené prihlásenie používateľa do aplikácie)}, label={fetchRequest}]
+fetch("http://login.nsoric.com/nsoric/auth/login/",
+    {
+        method: 'POST',
+        headers: { login: name, password: sha256(password) }
+    }
+)
+    .then(response => response.json())
+    .then(result => {
+        if (result.user.enabled) 
+            this.props.handleSuccessfulAuth(result.user, result.JWT);
+        else { 
+            if (result.message === "user does not exists") 
+                alert("Zle zadané prihlasovacie údaje!");
+         }
+\end{lstlisting}
+Metóda fetch je asynchrónna a teda vracia dátový typ \textit{promise}. To znamená, že metóda vráti synchrónne objekt promise ako dočasnú návratovú hodnotu predtým, než bude známa reálna hodnota. Potom, čo sa asynchrónna operácia dokončí, objekt zavolá callbak s výsledkom alebo chybou. Je to z toho dôvodu, aby aplikácia mohla normálne fungovať, kým získa odpoveď zo servera. Promise môže nadobúdať 3 stavy:
+\begin{itemize}
+\item \textbf{Čakajúci (Pending)} - v tomto stave je zahájená asynchrónna operácia, ale ešte nie je známy výsledok,
+\item \textbf{Splnený (Resolved alebo aj Fulfilled)} - v tomto stave je asynchrónna operácia dokončená úspešne a objekt volá úspešný callback,
+\item \textbf{Zamietnutý (Rejected)} - v tomto stave je asynchónna operácia dokončená neúspešne a objekt volá neúspešný callback. \cite{Promise}.
+\end{itemize}
+Konkrétne príklady dátového typu promise z aplikácie je možné vidieť v časti \ref{serverResponses} na obrázku \ref{fig:response1} (splnený stav) a na obrázkoch \ref{fig:response404} a \ref{fig:response500} (zamietnutý stav). Na obrázku \ref{fig:response2} je vidieť hodnotu, ktorú vrátila callback funkcia po úspešnom dokončení asynchrónnej funkcie.
+
+V kóde \ref{fetchRequest} sú v premennej \textit{response} uložené práve informácie o promise objekte (stav a hodnota). V premennej \textit{result} je už uložená finálna hodnota zo serveru vo formáte JSON.
+
+\subsection{Uchovávanie dát}\label{subsec:propsandstate}
+Ako bolo spomenuté v časti \ref{sec:IntroToReact}, komponenty v React aplikácií majú svoje vlastnosti (props) a spravujú svoj vnútorný stav (state). Na základe stavu a vlastností je postavená komunikácia medzi jednotlivými komponentmi v aplikácií. Vo vnútri jedného komponentu sa definuje stav a ten sa odovzdá druhému komponentu ako jeho vlastnosť. Problém nastáva pri obnovení stránky (okna aplikácie). Pri obnovení stránky sa obnovuje aj stav komponentov (a teda s tým spojené aj vlastnosti). Aby sa zabránilo strate dát uchovaných v stave komponentu, existujú 2 možnosti:
+\begin{itemize}
+\item ukladanie dát do lokálneho úložiska prehliadača (localStorage a sessionStorage),
+\item nastavovanie stavu po každom vykreslení komponentu (metóda componentDidMount).
+\end{itemize}
+\subsubsection*{Lokálne úložisko prehliadača}
+Internetové aplikácie môžu ukladať dáta lokálne do úložiska používateľovho prehliadača. Tieto úložiská sú takmer rovnaké, jediným rozdielom je, že dáta uložené v localStorage nemajú žiadnu expiračnú dobu. V aplikácií eAurela je používaný sessionStorage, ktorý je automaticky vymazaný pri zatvorení prehliadača (v tomto prípade aj pri zatvorení Electron aplikácie). Ten v aplikácii uchováva dôležité informácie zo servera, ktoré nemôžu byť počas chodu aplikácie stratené. Jedná sa napríklad o údaje prihláseného používateľa (aplikácia tak vie, kto je prihlásený), JWT token, ktorý je posielaný v každej požiadavke na server. Pri strate týchto údajov po obnovení stránky, by sa aplikácia stala nefunkčnou. Tieto úložiská uchovávajú dáta vo forme textového reťazca. Preto dáta iného dátového typu treba vždy pred uložením konvertovať na textový reťazec.
+\begin{lstlisting}[caption={Príklad uloženia hodnôt do sessionStorage}, label={sessionStorage.setItem}]
+sessionStorage.setItem('user', JSON.stringify(res1));
+sessionStorage.setItem('JWT', res2);
+\end{lstlisting}
+V kóde \ref{sessionStorage.setItem} sú prvé parametre ('user' a 'JWT') názov, pod ktorým budú dáta dostupné a druhé parametre sú samotné dáta, ktoré sa ukladajú. Získanie dát zo sessionStorage je ukázané v kóde \ref{sessionStorage.getItem}.
+\begin{lstlisting}[caption={Príklad použitia hodnôt zo sessionStorage}, label={sessionStorage.getItem}]
+const user = JSON.parse(sessionStorage.getItem('user'));
+const jwt = sessionStorage.getItem('JWT');
+\end{lstlisting}
+Síce sa sessionStorage vymaže automaticky pri zatvorení aplikácie, treba ho manuálne vymazať v prípade, že sa používateľ odhlási zo systému, no aplikáciu eAurela nechá otvorenú. Pre manuálne vymazanie celého obsahu úložiska slúži metóda \textit{sessionStorage.clear()}.
+\subsubsection*{Metóda \textit{componentDidMount}}
+Ďalšou možnosťou, ako predísť strate údajov, je posielanie požiadaviek a následné nastavovanie stavu v metóde \textit{componentDidMount}. Táto metóda prebehne vždy, keď je komponent vykreslený. Posielanie požiadaviek na server (fetch) je doporučené robiť práve v tejto metóde.
+\begin{lstlisting}[caption={Odoslanie požiadavku v metóde componentDidMount()}, label={componentDidMount}]
+componentDidMount() {
+    this.setState({ isLoading: true })
+    const ID = this.props.activeSector.id;
+    fetch(this.state.url + "/manage/sector/" + ID + "/last-values/",
+        {
+            method: 'GET',
+            headers: {Authorization: "Bearer " + this.state.jwt}
+        }
+    )
+        .then(response => response.json())
+        .then(result => {
+            // nastavenie stavu z odpovede zo servera
+            this.setState({ Sensors: result, isLoading: false })
+        })
+        .catch(error => console.log(error))
+}
+\end{lstlisting}
+Keďže namerané hodnoty zo senzorov majú byť vždy aktuálne, získavajú sa v tejto metóde. Komponent tak vždy po obnovení stránky má novú odpoveď zo servera s aktuálnymi nameranými hodnotami. Komponent obsahujúci metódu \textit{componentDidMount} sa vždy vykresľuje na dvakrát. Napríklad v komponente \textit{Sectors} sa najskôr vykreslia základné informácie o oblastiach a sektoroch a ikona načítavania, ktorá hovorí o tom, že aplikácia komunikuje so serverom (prebieha metóda componentDidMount).
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/componentDidMount.png}
+    \centering
+    \caption{Vykreslenie komponentu bez dát zo servera}
+    \label{fig:DidMount}
+\end{figure}
+Hneď ako aplikácia dostane odpoveď zo servera, ktorá obsahuje aktuálne údaje, na obrazovku sa dodatočne vykreslia tieto údaje bez toho, aby sa ostatné časti komponentu znovu vykresľovali. 
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/componentDidMount1.png}
+    \centering
+    \caption{Vykreslenie komponentu s dátami zo servera}
+    \label{fig:DidMount1}
+\end{figure}
+\section{Návrh dizajnu aplikácie}
+Komponenty v aplikácií sú základným stavebným blokom používateľského rozhrania. Ich vzhľad tvorí veľkú časť toho, ako bude aplikácia nakoniec vyzerať, ako ju bude vidieť samotný používateľ. Možností, ako upravovať štýl a vzhľad komponentov, je viacero. V aplikácií sú používané dva spôsoby úpravy vzhľadu komponentov: pomocou štylizovaných komponentov a pomocou CSS.
+\subsection{Štylizované komponenty}\label{reactstrapcomponents}
+Tento spôsob úpravy dizajnu je v aplikácií využívaný najviac. Pre jednoduchosť bola použitá knižnica \textit{reactstrap} (http://reactstrap.github.io/), ktorá obsahuje už vytvorené komponenty s hotovým dizajnom. Tie sú jednoducho vložené do vnútra komponentu, kde majú byť použité. Reactstrap je knižnica obsahujúca komponenty z \textit{React Bootstrap 4}. Knižnica nie je závislá na jQuery alebo na Bootstrap javascript.
+\subsubsection*{Komponenty pre interakciu s používateľom: <Input>, <Table> a <Form>}
+Keďže React používa syntax JSX (časť \ref{sec:IntroToReact}), pre interakciu s používateľom boli použité komponenty Input a Form. Tieto komponenty fungujú na podobnom princípe, ako v jazyku HTML. Input slúži ako vstup, kam používateľ zadáva údaje (text, heslo a podobne). Form je formulár, v ktorom sa nachádza viacero vstupných polí a potvrdením tohto formulára sa odosiela požiadavka na server.
+\begin{figure}[H]
+\includegraphics[width=0.5\textwidth]{obrazky/LoginForm.png}
+    \centering
+    \caption{Formulár pre prihlásenie do aplikácie}
+    \label{fig:LoginForm}
+\end{figure}
+V časti spravovania systému boli údaje pre ich sprehľadnenie vypísané na obrazovku do tabuľky. Pri upravovaní údajov zo servera bol použitý formulár, ktorý obsahoval tabuľku so vstupnými poľami (viď obrázok \ref{fig:Table}).
+\begin{figure}[H]
+\includegraphics[width=0.5\textwidth]{obrazky/Table.png}
+    \centering
+    \caption{Formulár s tabuľkou pre vytvorenie používateľa}
+    \label{fig:Table}
+\end{figure}
+\subsubsection*{Komponenty pre zobrazenie informácií: <Card>, <ListGroup>}
+Komponent Card (karta) v aplikácií zobrazuje informácie získané zo servera. Karta sa skladá z viacerých ďalších komponentov (potomkov), ktoré slúžia pre presné zadefinovanie miesta, kde bude údaj zobrazený. To slúži pre prehľadné zobrazenie dát. Prvý doplňujúci komponent karty je hlavička karty (CardHeader). V komponente Applist sa do hlavičky vypisuje názov spoločnosti, spolu aj s malým logom. Pri údajoch zo senzorov (obrazovka Sectors) sa do hlavičky vypisuje názov senzora a stav batérie (ak daný senzor batériu má). Ďalší dôležitý komponent pri vykresľovaní karty je jej telo (CardBody). V okne Applist je do tela karty vložený titulok (CardTitle). Ten zobrazuje doplňujúce informácie o spoločnosti, ako adresu a podobne. Najdôležitejší komponent v tele karty je ListGroup. Tento komponent slúži pre vypísanie zoznamu aplikácií v danej spoločnosti, z ktorej si používateľ môže vybrať a prihlásiť sa do nej. V časti \textit{Sectors} je telo karty použité na zobrazenie ID senzora, poslednej nameranej hodnoty zo senzora spolu s dátumom a časom, kedy bola táto hodnota nameraná.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/Cards.png}
+    \centering
+    \caption{Použitie karty pre výpis údajov}
+    \label{fig:Cards}
+\end{figure}
+\subsubsection*{Komponenty pre navigáciu: <Navbar>, <Nav>, <NavLink>} 
+Tieto komponenty slúžia pre jednoduchú navigáciu, či už medzi jednotlivými časťami aplikácie, alebo pri prechádzaní informácií. Za zmienku stojí v tejto časti komponent \textit{NavLink}. Komponent s takým istým názvom je aj v knižnici \textit{react-router-dom} (časť \ref{navigation}). Tieto komponenty vykonávajú v podstate to isté, rozdiel je v dizajne. Nevýhoda tohto komponentu je obnovenie obrazovky po kliknutí na tento odkaz, s čím môžu nastať problémy, ako boli popísané v časti \ref{subsec:propsandstate}. Aby sa odstránilo obnovovanie stránky pri kliknutí na odkaz, priradí sa mu funkcionalita komponentu \textit{Link} z knižnice \textit{react-router-dom}, ktorý presmeruje používateľa bez obnovenia stránky. Takto zapísaný \textit{NavLink} sa správa ako \textit{Link}, pričom mu zostane jeho dizajn. Takisto obsahuje vlastnosť \textit{active}, ktorá v aplikácií slúži na zvýraznenie časti, v ktorej sa používateľ nachádza (viď obr. \ref{fig:navbar}).
+\begin{lstlisting}[caption={Príklad prepojenia komponentov <NavLink> a <Link>}, label={NavLink}]
+<NavLink
+    tag={Link}      // priradenie funkcionality komponentu <Link>
+    to={props.path} // cesta, kam bude používateľ presmerovaný
+    onClick={handleClick} // funkcia vykonaná po kliknutí
+    >  
+    {props.link}    // hodnotu vlastnosti vidí používateľ ako odkaz
+</NavLink>
+\end{lstlisting}
+Komponenty \textit{Nav} a \textit{Navbar} slúžia ako rodičovské komponenty pre zoskupenie viacerých prvkov na navigáciu, alebo zobrazenie rôznych informácií. Rozdiel je v tom, že \textit{Navbar} má viacero možností nastavenia vzhľadu (od ktorých sa odvíja aj vzhľad "potomkov"), ale dá sa použiť iba horizontálne, pričom \textit{Nav} sa dá použiť aj vertikálne.
+\begin{figure}[H]
+\includegraphics[width=.6\textwidth]{obrazky/SectorsNavbar.png}
+    \centering
+    \caption{Komponenty <NavLink>, <Nav> a <Navbar>}
+    \label{fig:navbar}
+\end{figure}
+\subsection{Úprava vzhľadu pomocou CSS}
+V aplikácií bol taktiež na úpravu vzhľadu použitý jazyk CSS. Pre nastavenie základných vlastností aplikácie eAurela, ako štýl písma a podobne, bol použitý klasický spôsob vloženia odkazu na externý .css súbor do koreňového komponentu aplikácie. Taktiež aj pre dodatočnú úpravu niektorých komponentov z knižnice \textit{reactstrap} bol zvolený tento spôsob. React dovoľuje ale aj používanie CSS priamo vo vnútri komponentov. Tento spôsob bol použitý v aplikácií najmenej a bol použitý hlavne na prvky, ktorých vzhľad bolo treba dynamicky meniť (ako napríklad komponent \textit{NavLink} pri nastavení spomenutej vlastnosti \textit{active}).
+\begin{lstlisting}[caption={Dynamické nastavenie štýlu komponentu <NavLink>}, label={NavLinkStyle}]
+<NavLink
+    tag={Link}
+    /* štýl sa bude meniť vzhľadom na pravdivostnú
+    hodnotu premennej props.Graphs */
+    style={!props.Graphs ? {
+    color: "black",
+    backgroundColor: "white",
+    boxShadow: "0px 0px 0px 1px lightgrey"
+    } : style}
+    to="sectors"
+    active={!props.Graphs}
+</NavLink>
+\end{lstlisting}
+\section{Vykreslovanie grafov}
+Vzhľadom na funkčnú požiadavku R08 bolo potrebné v aplikácií eAurela zabezpečiť prácu s grafmi. Pre framework React existuje viacero knižníc pre prácu a zobrazenie grafov. V aplikácii eAurela je použitá knižnica \textit{recharts} (http://recharts.org/en-US/) pre jej bezplatnú dostupnosť a veľmi dobre vypracovanú dokumentáciu. Graf sa vykresľuje v samostatnom komponente \textit{SensorGraphs}, ktorý je následné vykreslený v komponente \textit{Sectors} po zvolení možnosti \textit{"Časový záznam"}. Na nasledujúcom obrázku je zobrazený graf v aplikácii eAurela s hodnotami z časového intervalu tridsať dní.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/SensorGraphs.png}
+    \centering
+    \caption{Vykreslenie grafu v komponente <Sectors>}
+    \label{fig:Graph}
+\end{figure}
+Knžinica recharts ponúka veľké množstvo grafov, či už čiarové, stĺpcové, koláčové a podobne. Keďže má aplikácia vykresľovať zmenu nameraných hodnôt z časového intervalu všetkých senzorov nachádzajúcich sa v sektore, bol použitý základný čiarový graf (LineChart). Vzhľadom na to, že v jednom grafe sa bude nachádzať viacero kriviek (podľa počtu senzorov), z dokumentácie \textit{recharts} bol vybraný čiarový graf s názvom \textit{"LineChartHasMultiSeries"}. Aby boli jednotlivé krivky správne vykreslené, komponent LineChart musí prevzať dáta upravené do správneho formátu. 
+\begin{lstlisting}[caption={Vzor formátu dát pre LineChart}, label={LineChartHasMultiSeries}]
+const series = [
+  {
+    name: 'Senzor 1',
+    data: [
+        {
+            date: "",
+            value: 
+        },
+        { ... }, ...
+    ],
+  },
+  { ... }, ...
+];
+\end{lstlisting}
+Konštanta \textit{series} je pole, kde každý prvok poľa predstavuje objekt s dvoma vlastnosťami: \textit{name} a \textit{data}. Vlastnosť \textit{name} obsahuje názov senzora, ktorý bude vypísaný v legende spolu s odpovedajúcou farbou krivky. Vlastnosť \textit{data} obsahuje konkrétne namerané dáta. \textit{Data} je taktiež pole objektov, kde jednotlivé objekty obsahujú taktiež dve vlastnosti: \textit{date} (dátum, kedy bola hodnota nameraná) a \textit{value} (nameraná hodnota). Táto konštanta je zadefinovaná vo funkcii pre vykreslenie komponentu (render).
+\begin{lstlisting}[caption={Zadefinovanie konštanty series}, label={renderSeries}]
+render() {
+    const series = this.getChartData(Sensors, Measurements);
+    return ( ... )
+}
+\end{lstlisting}
+V odpovedi zo servera dostaneme dve polia: \textit{sensors}, kde sú uložené všeobecné informácie o senzoroch a \textit{measurements}, kde sú namerané hodnoty za dané obdobie. Takáto odpoveď zo serveru vyzerá podobne ako na obrázku obr. \ref{fig:ServerValues}.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/ServerValues.png}
+    \centering
+    \caption{Odpoveď zo servera pri vykreslovaní grafu}
+    \label{fig:ServerValues}
+\end{figure}
+O spracovanie údajov zo servera do správneho formátu sa v aplikácií starajú dve metódy. Prvá metóda je \textit{getChartData}, ktorá ako parametre preberá namerané údaje zo servera (measurements), a taktiež všetky údaje o senzoroch (sensors). Táto metóda prechádza pole všetkých senzorov a pre vyhovujúce senzory (nevyhovujúce sú v tomto prípade senzory snímajúce stav batérie) priradí názov senzora. 
+\begin{lstlisting}[caption={Metóda getChartData}, label={getChartData}]
+getChartData(sensors, measurements) {
+        let chartData = [];
+            for (let i = 0; i < sensors.length; i++) {
+                if (isNaN(sensors[i].uid) || this.DecToBin(sensors[i].uid).substring(0, 8) !== "00000000") {
+                    chartData[i] = {
+                        name: sensors[i].name,
+                        data: this.getData(sensors[i].uid, measurements)
+                    }
+                }
+            }
+    return chartData;
+}
+\end{lstlisting}
+Pre zjednodušenie ukážky boli z kódu odstránené dodatočné podmienky ošetrujúce výnimočné stavy, ktoré môžu nastať pri komunikovaní so serverom. Práve v týchto podmienkach je použitý parameter \textit{measurements}. Taktiež je použitý ako vstupný parameter funkcie \textit{getData}, ktorá vyplní vlastnosť \textit{data} konkrétnymi hodnotami (dátumom, časom a konkrétnou hodnotou). Táto metóda preberá ako vstupný parameter aj ID senzora, aby bolo možné prideliť namerané hodnoty k správnemu senzoru. Táto metóda prechádza všetky namerané údaje a hľadá tie, ktoré boli namerané senzorom s príslušným ID. 
+ \begin{lstlisting}[caption={Metóda getData}, label={getData}]
+getData(id, measurements) {
+    let data = [];
+    let k = 0;
+    for (let i = (measurements.length - 1); i >= 0; i--) {
+        for (let j = 0; j < measurements[i].values.length; j++) {
+            if (id === measurements[i].values[j].sid) {
+                data[k] = {
+                    date: measurements[i].date.substring(0, 10) + " " + measurements[i].date.substring(11, 19),
+                    value: measurements[i].values[j].value !== null ? measurements[i].values[j].value : null
+                }   
+                break;
+            }
+        }
+        k++;    
+    }
+    return data;
+}
+\end{lstlisting}
+Aj v tejto ukážke boli pre zjednodušenie kódu vynechané podmienky ošetrujúce stavy, spôsobujúce chyby v aplikácií.
+
+Samotný komponent \textit{LineChart} sa skladá z viacerých ďalších komponentov, ktoré upresňujú rozloženie jednotlivých prvkov grafu a umiestnenie údajov. \textit{ResponsiveContainer} definuje šírku a výšku grafu. Komponenty \textit{XAxis} a \textit{YAxis} určujú, ktoré dáta sú vykreslené na každej z osí, či sa jedná o textové, alebo číselné údaje. Komponent \textit{Legend} vykresľuje legendu ku grafu, \textit{Tooltip} zobrazí nápovedu o konkrétnom dátume (nápovedu používateľ zobrazí prejdením kurzora do časti grafu, kde si chce prezrieť konkrétne hodnoty). \textit{Line} je samotná krivka, ktorej sa definujú dáta, ktoré sa použijú na vykreslenie. Keďže v aplikácií sa vykresľuje viacero kriviek do jedného grafu, bola použitá javascriptová metóda \textit{map} pre prechádzanie konštanty \textit{series} a pre každý jej prvok sa vykreslí vlastná krivka. Kód \ref{LineChart} zobrazuje implementáciu grafu v aplikácií aj s popisom jednotlivých častí a výsledný graf je možné vidieť na obrázku \ref{fig:TooltipGraph}.
+ \begin{lstlisting}[caption={Implementácia grafu LineChart}, label={LineChart}]
+<ResponsiveContainer width="95%" height="90%">
+     <LineChart>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis
+        dataKey="date"      // dáta zobrazené na osi X
+        type="category"     // textový údaj (dátum a čas)
+        allowDuplicatedCategory={false} // údaj sa nesmie opakovať
+        minTickGap={10} />  // medzera medzi údajmi v popise
+    <YAxis dataKey="value" />
+    <Tooltip />
+    <Legend />
+    {series.map((s, index) => (
+        <Line
+            key={index}     
+            dataKey="value"     // kľúčová hodnota
+            data={s.data}       // pôvod dát
+            name={s.name}       // názov senzoru
+            stroke={this.getRandomColor()}  // farba krivky
+            dot={false} />
+    ))}
+    </LineChart>
+</ResponsiveContainer>
+\end{lstlisting}
+Vzhľadom na to, že \textit{recharts} pri vykreslení viacerých kriviek do jedného grafu priradí všetkým základnú (rovnakú) farbu, bola pre lepšie rozlíšenie kriviek implementovaná funkcia \textit{getRandomColor}, ktorá každej krivke priradí náhodnú farbu.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/TooltipGraph.png}
+    \centering
+    \caption{Ukážka grafu s popisom jednotlivých komponentov}
+    \label{fig:TooltipGraph}
+\end{figure}
+
+\chapter{Uvedenie aplikácie do produkcie}\label{build}
+Aby bola aplikácia dostupná a spustiteľná pre bežného používateľa, je potrebné vykonať build aplikácie. Tento proces slúži pre transformáciu zdrojových kódov v spustiteľnú aplikáciu. Keďže na vývoj aplikácie boli použité dva frameworky, build sa musí vykonať pre každý framework zvlášť. V tejto kapitole sú opísané postupy a nástroje použité pri vytváraní spustiteľnej aplikácie pre jednotlivé platformy. Všetky uvedené zmeny v zdrojovom kóde sa týkajú súboru \textit{package.json}.
+
+\section{Buildovanie reactovej aplikácie}
+Keďže electron má zobrazovať reactovú časť aplikácie, je potrebné vykonať build reactovej časti ako prvý. React má zabudovaný skript pre vykonanie buildu, takže nie je potrebné pridať ďalšiu knižnicu (viď kód \ref{lst:package}). Najdôležitejšia vec pri vykonaní buildu reactovej aplikácie je nastavenie vlastnosti \textit{homepage}. Táto vlastnosť je kľúčová pre React. Vďaka nej presne vie, kde sa spustiteľná aplikácia nachádza. V prípade, že by sa táto vlastnosť neuviedla, nebolo by možné vidieť reactovú časť aplikácie vo vnútri electronovej aplikácie.
+\begin{lstlisting}[caption={Definovanie vlastnosti \textit{homepage} v aplikácii eAurela}, label={homepage}]
+"homepage": "./",
+\end{lstlisting}
+Po zadefinovaní vlastnosti \textit{homepage} je všetko pripravené na spustenie buildovacieho skriptu. Úspešné ukončenie skriptu je zobrazené na obrázku obr. \ref{fig:reactBuild}.
+\begin{figure}[H]
+\includegraphics[width=.9\textwidth]{obrazky/reactBuild.png}
+    \centering
+    \caption{Úspešné použitie buildovacieho skriptu pre React}
+    \label{fig:reactBuild}
+\end{figure}
+Po úspešnom prebehnutí tohoto skriptu sa v adresári aplikácie eAurela vytvorí nový priečinok s názvom \textit{build}. Tento priečinok obsahuje všetky statické súbory aplikácie, ktoré sú pripravené na prácu s electronovou časťou aplikácie.
+
+\section{Buildovanie electronovej aplikácie}
+Po úspešnom prebehnutí buildu v reactovej časti treba vykonať aj build electronovej časti, čo bude mať za výsledok spustiteľnú aplikáciu. Nakoľko Electron neobsahuje žiadny skript určený na buildovanie, bolo nutné použiť externú knižnicu. Použitá bola knižnica \textit{electron-packager} (https://github.com/electron/electron-packager). Po nainštalovaní knižnice je potrebné pridať buildovacie skripty do súboru \textit{package.json} pre každý operačný systém.
+\begin{lstlisting}[caption={Skripty pre použitie knižnice \textit{electron-packager}}, label={electron-packager}]
+// buildovací skript pre Mac OS
+"package-mac": "electron-packager . --platform=darwin --arch=x64",
+// buildovací skript pre Windows
+"package-win": "electron-packager . --platform=win32 --arch=x64",
+// buildovací skript pre Linux
+"package-lin": "electron-packager . --platform=linux --arch=x64"
+\end{lstlisting}
+Pre zjednodušenie kódu boli uvedené iba povinné parametre jednotlivých skriptov.Prvý parameter (\textit{electron-packager}) hovorí, aby sa spustil práve \textit{electron-packager}. Druhý parameter (\textit{.}) hovorí, kde sa nachádza zdrojový kód na zverejnenie. Nasledujúce dva parametre označujú práve cieľovú platformu (\textit{--platfrom}) a typ architektúry (\textit{--arch}). Ďalšie voliteľné parametre by mohli byť názov aplikácie (ak nie je uvedený, použije sa názov uvedený pod vlastnosťou \textit{name} v súbore \textit{package.json}), ikona aplikácie a podobne. Úspešný priebeh skriptu \textit{package-win} je vyobrazený na obrázku obr. \ref{fig:electronBuild}.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/electronBuild.png}
+    \centering
+    \caption{Buildovanie aplikácie eAurela pre platformu Windows}
+    \label{fig:electronBuild}
+\end{figure}
+Po úspešnom ukončení skriptu sa opäť vytvorí nový priečinok, ktorý obsahuje spustiteľnú aplikáciu, ako aj zdrojový kód.

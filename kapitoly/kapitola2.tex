@@ -1,0 +1,160 @@
+\chapter{Analýza požiadaviek a štruktúra}
+Táto kapitola popisuje špecifikáciu funkčných a nefunkčných požiadaviek, z ktorých vyplývajú prípady použitia. Ďalej je v kapitole opísaný návrh štruktúry aplikácie, popis jednotlivých častí a priblíženie, ako aplikácia eAurela funguje, pomocou diagramov aktivít.
+
+\section{Požiadavky aplikácie}
+Známe sú dva základné typy požiadaviek: funkčné a nefunkčné. Funkčné požiadavky dávajú prehľad o softvérovej funkcionalite, ktorá musí byť implementovaná. Sú to požiadavky na správanie systému. Nefunkčné požiadavky sa môžu tiež nazvať systémové požiadavky. Sú to požiadavky, ktoré sa zaoberajú vlastnosťami systému, výkonom, bezpečnosťou a podobne. Ďalej sú popísané minimálne požiadavky na spustenie aplikácie a požiadavky týkajúce sa bezpečnosti systému.
+\subsection{Funkčné požiadavky}
+\begin{table}[H]
+\large
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{2}{|l|}{Funkčné požiadavky} & Doplňujúce informácie \\ \hline
+R01 & Prihlásenie do systému & \begin{tabular}[c]{@{}l@{}}Každému používateľovi systému Sensorical je vytvorený vlastný login\\a heslo. Pomocou týchto údajov sa používateľ prihlási.\end{tabular} \\ \hline
+R02 & Spravovanie systému & \begin{tabular}[c]{@{}l@{}}Ak má používateľ pridelené administrátorské práva, môže spravovať\\údaje uložené na serveri.\end{tabular} \\ \hline
+R03 & Voľba aplikácie zberu dát & \begin{tabular}[c]{@{}l@{}}Možnosť výberu aplikácie zberu dát, ku ktorému sa eAurela pripojí.\\Aplikácia eAurela sa pripája k serveru, na ktorom sa vybraná\\aplikácia nachádza.\end{tabular} \\ \hline
+R04 & Spravovanie informačného systému & \begin{tabular}[c]{@{}l@{}}Ak má používateľ pridelené práva na spravovanie aplikácie, môže\\meniť napríklad nastavenie senzorov, zapnúť alebo vypnúť meranie\\a podobne.\end{tabular} \\ \hline
+R05 & Výber z povolených údajov & Používateľ vidí iba údaje, ku ktorým má pridelené oprávnenia. \\ \hline
+R06 & Zobrazenie hodnôt & \begin{tabular}[c]{@{}l@{}}Zobrazenie poslednej nameranej hodnoty na každom senzore vo vybranej\\oblasti. Hodnoty sú zobrazené spolu s fyzikálnou jednotkou,\\dátumom a časom.\end{tabular} \\ \hline
+R07 & Umiestnenie senzorov & Jednotlivé senzory sú zaradené do oblastí a sektorov. \\ \hline
+R08 & Zobrazenie grafov & Zobrazenie nameraných hodnôt vo forme grafu časovej závislosti. \\ \hline
+R09 & Výber časového intervalu & Výber časového intervalu, v ktorom aplikácia zobrazí namerané hodnoty. \\ \hline
+R10 & Odhlásenie z aplikácie. &  \\ \hline
+\end{tabular}%
+}
+\caption{Funkčné požiadavky aplikácie eAurela}
+\label{funkcnePoziadavky}
+\end{table}
+\clearpage
+
+\subsection{Nefunkčné požiadavky}
+
+\begin{table}[]
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{2}{|l|}{Nefunkčné požiadavky} & Doplňujúce informácie \\ \hline
+R01 & Aplikácia vo forme desktopovej aplikácie a internetovej aplikácie & \begin{tabular}[c]{@{}l@{}}Aplikácia eAurela bude dostupná v dvoch formách.\\ Dostupná bude ako desktopová aplikácia podporovaná\\  operačnými systémami Mac, Windows a Linux.\\ Taktiež bude fungovať ako internetová aplikácia\\  dostupná v internetovom prehliadači.\end{tabular} \\ \hline
+R02 & Implementovaná v jazyku javascript, HTML a CSS & \begin{tabular}[c]{@{}l@{}}Na implementáciu budú použité dva javascriptové\\ frameworky: Electron.js a React.js.\end{tabular} \\ \hline
+R03 & Bezpečné overovania & \begin{tabular}[c]{@{}l@{}}Používateľovi bude po každom prihlásení vygenerovaný\\ JWT token, ktorý sa používa pri každej požiadavke na\\ server a je platný po dobu jednej hodiny. Po odhlásení\\ bude JWT token deaktivovaný a ďalej neplatný.\end{tabular} \\ \hline
+R04 & Aplikácia sa bude dať vylepšiť & \begin{tabular}[c]{@{}l@{}}Aplikácia bude implementovaná tak, aby bolo možné\\ v budúcnosti pridať nové, alebo vylepšiť staré funkcie.\end{tabular} \\ \hline
+\end{tabular}%
+}
+\caption{Nefunkčné požiadavky aplikácie eAurela}
+\label{nefunkcnePoziadavky}
+\end{table}
+
+\subsection{Minimálne požiadavky pre spustenie aplikácie}
+Nakoľko je aplikáciu možné spustiť na viacerých operačných systémoch (Windows, Mac OS a Linux) a zároveň je dostupná aj v internetovom prehliadači ako internetová aplikácia, je potrebné definovať minimálne požiadavky pre oba typy.
+\begin{itemize}
+\item \textbf{Podporované operačné systémy}
+\begin{itemize}
+\item Minimálna podporovaná verzia operačného systému Windows je \textbf{Windows 7}. Staršie verzie tohto operačného systému nie sú podporované,
+\item Pre operačný systém Mac OS je minimálna podporovaná verzia \textbf{Mac OS 10.10} (Yosemite). Pre operačný systém Mac OS sú podporované iba 64-bitové verzie,
+\item Minimálne podporované verzie operačného systému Linux pre spustenie Electron aplikácie sú \textbf{Ubuntu 12.04}, \textbf{Fedora 21} a \textbf{Debian 8} \cite{ElectronRequirements},
+\end{itemize}
+\item \textbf{Internetový prehliadač}
+\begin{itemize}
+\item Aplikácia vyvíjaná vo frameworku React závisí od typov javascriptových kolekcií \textit{Map} a \textit{Set}. Niektoré internetové prehliadače tieto kolekcie nemusia poskytovať, napríklad \textbf{Internet Explorer 11} a staršie verzie tohto prehliadača \cite{ReactRequirements}.
+\end{itemize}
+\end{itemize}
+\subsection{Bezpečnosť systému a vplyv na aplikáciu eAurela} \label{bezpecnost}
+Bezpečnosť systému zabezpečujú dva prvky. Prvým je, že každý používateľ má priradené meno (login) a heslo (password), pomocou ktorých sa prihlasuje do systému. Po prihlásení sa používateľovi vygeneruje tzv. JWT token, ktorý je platný 1 hodinu. Vygenerovaný JWT token musí byť použitý pre prihlásenie sa do konkrétneho informačného systému, bez neho prihlásenie nie je možné. Po prihlásení do informačného systému sa generuje nový JWT token, ktorý platí iba v danom informačnom systéme a je taktiež platný po dobu jednej hodiny. JWT musí byť odosielaný v každej požiadavke na server, inak je požiadavka neplatná. Po používateľovom odhlásení zo systému, sa JWT token stáva neplatný, tým pádom ho nie je možné znovu použiť.
+
+\section{Diagram prípadov použitia a návrh štruktúry}
+Táto podkapitola je venovaná diagramu prípadov použitia a ďalej návrhu štruktúry aplikácie, ktoré vyplývajú z funkčných požiadaviek aplikácie. Sú tu popísaní všetci aktéri, ktorí môžu vykonávať v aplikácií rôzne aktivity. Taktiež je tu podrobne popísaná štruktúra aplikácie eAurela.
+\subsection{Diagram prípadov použitia}
+Diagram prípadov použitia (Use Case Diagram) zobrazuje správanie systému tak, ako ho vidí používateľ. Účelom je popísať funkcionalitu systému, teda to, čo od neho klient očakáva. Diagram prípadov použitia sa skladá z prípadov použitia (use case), aktérov (actors) a vzťahov medzi nimi.
+\subsubsection*{Prípad použitia}
+Prípad použitia je sada niekoľkých akcií, ktoré vedú k dosiahnutiu určitého cieľa. Definuje teda funkcionalitu, ktorú by mal navrhovaný systém obsahovať. Prípady použitia vychádzajú zo zadania systému od zákazníka.
+\subsubsection*{Aktér}
+Aktér je rola, ktorá komunikuje s jednotlivými prípadmi použitia. V tejto roli môže byť používateľ, alebo aj externý systém. Aktérom môže byť napríklad Administrátor alebo dokonca aj Čas \cite{UseCase}.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/UseCase.png}
+    \centering
+    \caption{Diagram prípadov použitia aplikácie eAurela}
+    \label{fig:usecase}
+\end{figure}
+
+\textbf{Popis aktérov a prípadov použitia}
+\begin{itemize}
+\item Používateľ:
+\begin{itemize}
+\item každý používateľ, o ktorom sú zaznamenané údaje v databáze na vzdialenom serveri Auth API,
+\item sú mu zobrazené iba tie údaje zo systému, ku ktorým má pridelené oprávnenia,
+\item môže si vybrať informačný systém, ku ktorému sa aplikácia pripojí,
+\item má možnosť si prezerať poslednú nameranú hodnotu zo senzora, prezerať namerané hodnoty vo forme grafu, v časovom intervale, ktorý si zvolí,
+\item môže si vybrať oblasť a sektor,
+\end{itemize}
+\item Manage API Admin:
+\begin{itemize}
+\item administrátor konkrétneho informačného systému  (Manage API),
+\item dedí z aktéra \textit{Používateľ}, teda môže vykonávať rovnaké aktivity ako on,
+\item navyše môže spravovať porty, sektory, senzory,
+\item má možnosť zapnúť alebo vypnúť meranie v informačnom systéme,
+\item taktiež si môže zobraziť všetkých používateľov, ktorí majú k informačnému systému prístup,
+\end{itemize}
+\item Auth API Admin:
+\begin{itemize}
+\item administrátor serveru slúžiaceho na autorizáciu (Auth API),
+\item dedí z aktéra \textit{Manage API Admin},
+\item okrem vyššie spomenutých aktivít môže pridať a odstrániť používateľov zo systému, alebo im môže meniť údaje,
+\item tiež môže spravovať spoločnosti a informačné systémy v nich.
+\end{itemize}
+\end{itemize}
+
+\subsection{Štruktúra aplikácie eAurela}\label{structure}
+Návrh štruktúry aplikácie vychádza z určených funkčných požiadaviek a jednotlivých prípadov použitia. Každý prípad použitia nám určuje samostatnú časť aplikácie. Štruktúra aplikácie eAurela nám popisuje jednotlivé časti a navigáciu medzi nimi. Aplikácie sa skladá z nasledovných častí:
+\begin{itemize}
+\item Home - časť pre prihlasovanie sa do systému,
+\item AppList - časť pre výber aplikácie,
+\item AuthAdministration - časť pre správu serveru \textit{Auth API},
+\item ManageAdministration - časť pre správu konkrétnej aplikácie (\textit{Manage API}),
+\item ManageAddUser - časť pre vytvorenie nového používateľa v aplikácií,
+\item Sectors - časť pre zobrazenie nameraných hodnôt v sektoroch.
+\end{itemize}
+
+\subsection{Funkcionalita častí aplikácie}
+\subsubsection*{Home}
+Predtým, než si používateľ vyberie aplikáciu a získa prístup k dátam, musí sa prihlásiť. Obrazovka Home slúži pre prihlásenie do systému. Obrazovka Home sa vždy zobrazí hneď po spustení aplikácie eAurela. Používateľ uvidí textové polia pre zadanie prihlasovacích údajov (login a heslo). Po zadaní údajov a kliknutí na tlačidlo prihlásiť, sa pošle na server požiadavka o prihlásenie so zadanými údajmi. V prípade, že sú údaje nesprávne, zobrazí sa upozornenie o zle zadaných údajoch. V prípade, že sú zadané údaje správne, používateľ bude prihlásený a bude presmerovaný do časti Applist. V tejto časti aplikácia komunikuje so serverom pre autorizáciu (\textit{Auth API}). Proces prihlasovania je vyobrazený v diagrame aktivít \ref{fig:HomeActivity}.
+\begin{figure}[H]
+\includegraphics[width=0.8\textwidth]{obrazky/LoginActivity.png}
+    \centering
+    \caption{Diagram aktivít časti Home}
+    \label{fig:HomeActivity}
+\end{figure}
+\subsubsection*{Applist}
+Táto obrazovka sa zobrazí ako prvá obrazovka ihneď po úspešnom prihlásení. Používateľovi sú zobrazené spoločnosti, ku ktorým má pridelené prístupové práva. V týchto spoločnostiach sa nachádzajú aplikácie, ktoré obsahujú namerané údaje z konkrétnych senzorov, nachádzajúcich sa v danej aplikácii. Po výbere aplikácie bude odoslaná požiadavka o prihlásenie do konkrétnej aplikácie. Údaje zobrazené v tomto okne sú údaje, ktoré sa nachádzajú na serveri pre autorizáciu. Požiadavka o prihlásenie do aplikácie ale smeruje na server konkrétnej aplikácie (\textit{Manage API}). Ak má používateľ pridelené administrátorské práva, môže si taktiež zvoliť možnosť pre prístup do časti AuthAdministration.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/ApplistActivity.png}
+    \centering
+    \caption{Diagram aktivít časti Applist}
+    \label{fig:ApplistActivity}
+\end{figure}
+\subsubsection*{AuthAdministration}
+Táto časť aplikácie je sprístupnená výhradne administrátorom systému. Sú tu zobrazené informácie o všetkých používateľoch systému a ich prístupových právach k spoločnostiam, zoznam všetkých spoločností a k nim priradených aplikácií. Administrátor systému môže tieto údaje upravovať, ako napríklad meniť práva používateľom, zmeniť používateľovi heslo, meniť a aktualizovať informácie o spoločnostiach a ich aplikáciách. Taktiež môže zmazať existujúcu, alebo vytvoriť novú spoločnosť, či aplikáciu. Táto časť slúži pre spravovanie serveru \textit{Auth API} (kapitola \ref{sub:auth}).
+\subsubsection*{Sectors}
+Táto obrazovka je zobrazená po úspešnom prihlásení používateľa do aplikácie. Pri prihlasovaní do aplikácie sa znovu overuje, či má používateľ administrátorské práva (administrátor na serveri \textit{Manage API} nemusí byť aj administrátor na serveri \textit{Auth API}). Používateľovi sú zobrazené oblasti a sektory, ktoré sa nachádzajú v aplikácií, a zároveň k nim má používateľ prístupové práva. Taktiež sú tu zobrazené aj posledné namerané hodnoty zo senzorov nachádzajúcich sa v sektore. Používateľ si bude môcť vybrať oblasť a sektor, ktorého hodnoty si chce prezerať. V prípade, že si bude chcieť pozrieť časový záznam zo všetkých senzorov daného sektora, môže si zvoliť zobrazenie údajov vo forme časového záznamu. V tomto prípade bude zobrazená časová závislosť (graf) všetkých nameraných údajov zo sektora vo vybranom časovom intervale. Používateľ má možnosť zvoliť časový interval, z ktorého budú následne zobrazené namerané hodnoty. Ak má používateľ administrátorské práva v danej aplikácií, môže si tiež zvoliť prechod do časti ManageAdministration.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/SectorsActivity.png}
+    \centering
+    \caption{Diagram aktivít časti Sectors}
+    \label{fig:SectorsActivity}
+\end{figure}
+\subsubsection{ManageAdministration}
+Podobne ako v prípade AuthAdministration, aj k tejto časti majú prístup iba administrátori. Sú tu zobrazené informácie o používateľoch aplikácie, oblastiach, sektoroch a senzoroch. Taktiež tu je možné zastaviť, alebo spustiť meranie. Z tejto obrazovky je možné prejsť k obrazovke pre vytvorenie nového používateľa systému. Táto časť slúži pre spravovanie serveru \textit{Manage API} (kapitola \ref{sub:manage}).
+\subsubsection*{ManageAddUser}
+V tomto okne môže administrátor systému vytvoriť nového používateľa. Pri otvorení tohto okna je zobrazený formulár obsahujúci polia pre vstup údajov nového používateľa. Po vyplnení údajov a potvrdení formulára sa odošle požiadavka na server o vytvorenie nového používateľa. Server skontroluje, či používateľ existuje. Môžu nastať tri možnosti:
+\begin{enumerate}
+\item používateľ neexistuje na žiadnom serveri,
+\item používateľ existuje na serveri pre autorizáciu, ale neexistuje na serveri aplikácie,
+\item používateľ existuje na obidvoch serveroch.
+\end{enumerate}
+V prvom prípade sa používateľ vytvorí na obidvoch serveroch. Na oboch serveroch bude mať používateľ priradené najnižšie prístupové práva a bude mať prístup k jednej spoločnosti a jednej aplikácií (tej, z ktorej bol vytváraný). V druhom prípade sa používateľ vytvorí iba na serveri informačného systému, pričom na serveri pre autorizáciu sa používateľovi priradí aplikácia, v ktorej bol vytvorený. Ak používateľ existuje na obidvoch serveroch, ukáže sa informácia, že daný používateľ už existuje. Nakoniec nasleduje presmerovanie do časti ManageAdministration. V nasledujúcom diagrame je zobrazené vytváranie nového používateľa.
+\begin{figure}[H]
+\includegraphics[width=0.9\textwidth]{obrazky/AddUserActivity.png}
+    \centering
+    \caption{Diagram aktivít pre vytvorenie nového používateľa}
+    \label{fig:AddUserActivity}
+\end{figure}
+

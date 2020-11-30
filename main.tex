@@ -1,0 +1,255 @@
+%hidelinks- zrusi cervene oramovanie v pdf
+\documentclass[a4paper,12pt,hidelinks]{report}
+\usepackage[slovak,english]{babel}
+\usepackage[utf8]{inputenc}  
+\usepackage[protrusion=true,expansion=true]{microtype}
+%\usepackage{mathpazo}
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}  
+\usepackage[table,xcdraw]{xcolor}
+\linespread{1.2} %1.2
+%alebo cez \renewcommand{\baselinestretch}{1.5}\normalsize
+\usepackage{moresize}
+%\usepackage{enumitem}
+%\usepackage{geometry}
+\usepackage[a4paper,left=3.2cm,right=2.2cm,top=2.5cm,bottom=3cm]{geometry}
+%\addtolength{\oddsidemargin}{-.4cm}
+%\addtolength{\evensidemargin}{-3.2cm}
+%\addtolength{\topmargin}{-1cm}
+%\addtolength{\textheight}{0cm}
+%\addtolength{\textwidth}{1.4cm}
+%\addtolength{\textheight}{1.4cm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage{eurosym}
+\usepackage{url,mathptmx}
+\usepackage{booktabs}
+\usepackage{array, hhline}
+\usepackage{lscape}
+%\usepackage{amssymb, amsmath, amsfonts, lmodern}
+\usepackage{amssymb, amsmath, lmodern}
+%toto je trochu ine pismo \usepackage{amssymb,amsfonts,amscd}
+\usepackage{acronym}
+\usepackage{paralist}
+%\usepackage{verbatim}
+\usepackage{minted} %minted
+%\usemintedstyle{colorful} %minted
+%==============zrusenie cerveneho ramiku pri chybe
+\makeatletter
+\AtBeginEnvironment{minted}{\dontdofcolorbox}
+\def\dontdofcolorbox{\renewcommand\fcolorbox[4][]{##4}}
+\makeatother
+%==============zrusenie cerveneho ramiku pri chybe
+\setminted[json]{fontsize=\footnotesize} %minted
+\setminted[java]{fontsize=\footnotesize} %minted
+\setminted[js]{fontsize=\footnotesize} %minted
+\usepackage{chngcntr} %minted
+\counterwithin{listing}{chapter} %minted
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+
+\usepackage{comment}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[pdftex,unicode,bookmarks=false]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{csquotes}
+%\usepackage{subcaption} %package pre moznost mat 2 obrazky vedla seba
+\usepackage{nameref} %package pre moznost referencovania celym menom kapitol
+
+%\tolerance=1
+%\emergencystretch=\maxdimen
+%\hyphenpenalty=10000
+%\hbadness=10000
+
+\renewcommand{\chaptermark}[1] % HEADER / FOOTER  DEFINITIONS
+{
+  \markboth{#1}{}
+}
+\usepackage{sectsty}% SECTION TITLE APPEARANCE
+\allsectionsfont{\mdseries\upshape}
+\usepackage[explicit]{titlesec}
+
+\usepackage[nottoc,notlof,notlot]{tocbibind}
+\usepackage[titles,subfigure]{tocloft}
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont} {\rmfamily\mdseries\upshape}
+
+\usepackage{nicefrac}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{denim}{rgb}{0.08, 0.38, 0.74}
+\definecolor{carrotorange}{rgb}{0.93, 0.57, 0.13}
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, try},
+  keywords=[3]{fetch, then, setState,log, alert, reload, json},
+  keywords=[4]{const, let, props, state, this},
+  keywordstyle=\color{red}\bfseries,
+  keywordstyle=[3]\color{black},
+  keywordstyle=[4]\color{darkblue},
+  ndkeywords={class, export, boolean, throw, implements, import, from},
+  ndkeywordstyle=\color{purple}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{darkgreen}\ttfamily,
+  stringstyle=\color{carrotorange}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+\lstset{
+literate=%
+         {á}{{\'a}}1
+         {í}{{\'i}}1
+         {é}{{\'e}}1
+         {ý}{{\'y}}1
+         {ú}{{\'u}}1
+         {ó}{{\'o}}1
+         {ě}{{\v{e}}}1
+         {š}{{\v{s}}}1
+         {č}{{\v{c}}}1
+         {ř}{{\v{r}}}1
+         {ž}{{\v{z}}}1
+         {ď}{{\v{d}}}1
+         {ť}{{\v{t}}}1
+         {ľ}{{\v{l}}}1
+         {ň}{{\v{n}}}1                
+         {ů}{{\r{u}}}1
+         {Á}{{\'A}}1
+         {Í}{{\'I}}1
+         {É}{{\'E}}1
+         {Ý}{{\'Y}}1
+         {Ú}{{\'U}}1
+         {Ó}{{\'O}}1
+         {Ě}{{\v{E}}}1
+         {Š}{{\v{S}}}1
+         {Č}{{\v{C}}}1
+         {Ř}{{\v{R}}}1
+         {Ž}{{\v{Z}}}1
+         {Ď}{{\v{D}}}1
+         {Ť}{{\v{T}}}1
+         {Ň}{{\v{N}}}1                
+         {Ů}{{\r{U}}}1 
+         {ô}{{\^{o}}}1
+}
+\lstset{
+   language=JavaScript,
+   backgroundcolor=\color{white},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   %numbers=left,
+   numberstyle=\footnotesize,
+   numbersep=9pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
+%\lstset{style=mystyle}
+
+\addbibresource{literatura.bib}
+
+\newtheorem{mydef}{Definícia}
+\newtheorem{myexample}{Príklad}
+
+\newcommand\sbref[1]{[\ref{#1}]}
+\newcommand\cref[1]{Kód \ref{#1}}
+\newcommand\picref[1]{Obrázok \ref{#1}}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  %\fancyhead[L, R]{MTF STU \hfill BAKALÁRSKA PRÁCA } hlavicka MTF STU
+   \fancyfoot[C]{}
+   \fancyfoot[R]{\thepage}
+}
+ \renewcommand{\headrulewidth}{0pt} % remove lines as well
+
+\titlespacing*{\chapter}{0pt}{-30pt}{30pt}
+
+\titleformat{\section}{\Large\bf}{\textcolor{black}{\thesection \hspace{12pt} #1}}{0pt}{}
+%\titleformat{\subsection}{\large\bf}{\textcolor{black}{#1}}{0pt}{}
+\subsubsectionfont{\bf}
+
+%pridane
+\subsectionfont{\bf}
+%pridane
+%\usepackage[font=small]{caption} %font pre caption v obrazkoch
+
+%zmena nazvu caption Listing
+\renewcommand\listingscaption{Kód} %minted
+\renewcommand\lstlistingname{Kód}
+\renewcommand\lstlistlistingname{Zdrojové kódy}
+
+\begin{document}
+\selectlanguage{slovak}
+
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{10pt}{\huge#1}
+%\titleformat{\chapter}[display]{\normalfont\bfseries}{}{10pt}{\huge\thechapter \quad#1}
+
+
+\pagenumbering{gobble}  %roman
+
+\pagestyle{empty}
+\include{special/obal.tex}
+\includepdf{prilohy/obal.pdf}
+\includepdf{prilohy/title.pdf}
+\includepdf{prilohy/zadanie.pdf}
+\include{special/zadanie_prace.tex}
+
+\pagestyle{plain}
+\setcounter{page}{3}
+
+\include{special/cestne_prehlasenie}
+\include{special/podakovanie}
+\include{special/abstrakt}
+
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\setcounter{page}{7}
+
+\include{special/obsah}
+% vynechany zoznam obrazkov a tabuliek
+%\include{special/zoznamy}
+%\include{special/skratky}
+
+
+\include{kapitoly/uvod}
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{10pt}{\huge\thechapter \quad#1}
+
+ %Pripadne doplniť dalsie
+%\include{kapitoly/ciele}
+\include{kapitoly/kapitola1}
+\include{kapitoly/kapitola2}
+\include{kapitoly/kapitola3}
+\include{kapitoly/kapitola4}
+\include{kapitoly/kapitola5}
+
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{10pt}{\huge#1}
+\include{kapitoly/zaver}
+
+%\renewcommand{\thepage}{} %pridane pre necislovanie bibliografie
+\renewcommand{\bibsection}{\chapter{Zoznam použitej literatúry}}
+\addcontentsline{toc}{chapter}{Zoznam použitej literatúry}
+%\nocite{*}  %sluzi pre debugovanie, zakomentovat
+
+\printbibliography[title=Zoznam použitej literatúry]
+
+\include{prilohy/zoznam_priloh}
+
+ %Pripadne doplniť dalsie
+%\include{prilohy/priloha1}
+%\include{prilohy/priloha2}
+%\include{prilohy/priloha3}
+
+\end{document}

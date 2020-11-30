@@ -1,0 +1,219 @@
+\chapter{Informačný systém Sensorical}
+
+Informačný systém Sensorical je systém, ktorý bol navrhnutý v spoločnosti TNTech s.r.o. a je to ucelený systém pre zber a analýzu environmentálnych dát. Tento systém sa skladá z hardvérovej a softvérovej časti.
+\subsubsection*{Hardvérová časť}
+Skladá sa z meracích zariadení (senzorov), ktoré vysielajú namerané dáta a z jedného alebo viacerých prijímacích modulov, ktoré pokrývajú monitorovanú oblasť.
+
+Meracie zariadenie má za úlohu spracovať namerané hodnoty, pripraviť telemetrické dáta, formátovať dáta podľa určeného kľúča a odoslať spracované údaje prostredníctvom rádiového rozhrania.
+
+Modul prijímača je určený pre bezdrôtový príjem dát odoslaných meracími zariadeniami. Obsahuje tiež modul komunikačného rozhrania RS485, čo umožňuje zaradiť viac prijímacích modulov na jeden káblový rozvod.
+
+\subsubsection*{Softvérová časť}
+Merací systém je určený pre dlhodobé merania. Softvérovú časť môžeme ďalej rozdeliť na dátovú a aplikačnú časť.
+
+Dátová sa skladá z dvoch databázových modelov a z aplikačného programového rozhrania (API).
+
+Prvý databázový model predstavuje databázu, ktorá slúži pre uchovávanie informácií potrebných na autorizáciu, a taktiež informácie o aplikáciach pre zber environmentálnych dát, s ktorými systém pracuje (viď \ref{sub:auth}). Táto databáza je uložená na serveri, ktorý bol pomenovaný \textit{Auth API}.
+
+Druhý databázový model je reprezentovaný databázou, ktorá uchováva údaje o konkrétnej aplikácii zberu dát (viď \ref{sub:manage}). Pre každú aplikáciu je vytvorená vlastná databáza, ktorá môže byť uložená na serveri \textit{Auth API} alebo na ľubovoľnom inom. Pre jasnú identifikáciu sa tieto servery nazývajú \textit{Manage API}. Informácie o serveroch sa nachádzajú v prvom databázovom modeli. 
+
+V aplikačnej časti sa nachádza viacero softvérových produktov. Tieto produkty slúžia na prístup a analýzu nameraných údajov \cite{Sensorical}, \cite{nSoric}.
+ 
+\section{Dátový model}
+Pre systém Sensorical boli vytvorené dva databázové modely. Prvý model sa týka autorizácie používateľov. Databáza sa delí na časti: časť definujúca používateľov systému, časť definujúca spoločnosti a aplikácie, časť s obmedzeniami používateľov.
+
+Druhý model sa týka konkrétnych aplikácií zberu dát. Aplikácia môže byť spustená na serveri, kde je spustená autorizácia používateľov, ale taktiež môže byť spustená aj na inom serveri. Tento model sa delí na časti: časť rozmiestnenia senzorov, časť s informáciami o senzoroch, časť pre ukladanie nameraných hodnôt.
+
+\subsection{Dátový model pre autorizáciu} \label{sub:auth}
+Tento model definuje všetkých používateľov systému Sensorical. Pri prihlasovaní do systému prebieha porovnávanie údajov s údajmi uloženými v tejto databáze. Štruktúra tabuliek, označenie primárnych kľúčov a dátových typov jednotlivých atribútov je zobrazená na obrázku obr. \ref{fig:dblogin}.
+\subsubsection*{Štruktúra dátového modelu pre autorizáciu}
+\begin{figure}[H]
+\includegraphics[width=.8\textwidth]{obrazky/login.png}
+    \centering
+    \caption{Entitno-relačný diagram dátového modelu pre autorizáciu používateľov}
+    \label{fig:dblogin}
+\end{figure}
+
+\subsubsection*{Časti dátového modelu pre autorizáciu}
+\begin{itemize}
+	\item časť definujúca všetkých používateľov systému:
+	\begin{itemize}
+	    \item entitná množina \textbf{Users},
+	\end{itemize}
+	\item časť definujúca spoločnosti a aplikácie:
+	\begin{itemize}
+	    \item entitné množiny \textbf{Companies, Apps, Servers},
+	\end{itemize}
+	\item časť s obmedzeniami používateľov:
+	\begin{itemize}
+	    \item entitné množiny \textbf{Restrictions, AppRestrictions}.
+	\end{itemize}
+\end{itemize}
+
+\subsection*{Časť definujúca používateľov systému}
+Systém Sensorical môže používať viacero používateľov, preto je nevyhnutné zaznamenávať informácie o používateľoch, ich údaje a práva.
+\subsubsection*{Users}
+Každému používateľovi je vytvorené prihlasovacie meno (login) a heslo (password), ktorými sa prihlasuje do systému. Atribút isAdmin hovorí, či má používateľ administrátorské práva.
+
+\subsection*{Časť definujúca spoločnosti a aplikácie}
+Entitné množiny v tejto časti obsahujú informácie o spoločnostiach a aplikáciách, ku ktorým sa dá pripojiť, a taktiež o serveroch, na ktorých sa dané aplikácie nachádzajú.
+\subsubsection*{Companies}
+Zoznam všetkých spoločností. Entitná množina \textit{UserCompanies} určuje, ktorý používateľ má prístup k spoločnosti.
+\subsubsection*{Apps}
+Zoznam všetkých aplikácií zberu dát, ku ktorým sa dá prihlásiť. Vzťah medzi entitnými množinami \textit{Companies} a \textit{Apps} je 1:N, teda spoločnosť môže mať viacero aplikácií, ale aplikácia sa môže nachádzať iba v jednej spoločnosti.
+\subsubsection*{Servers}
+Každá aplikácia sa môže nachádzať na inom serveri. Táto entitná množina definuje práve informácie o serveroch a ich URL adrese.
+
+\subsection*{Časť s obmedzeniami používateľov}
+Tieto entitné množiny nám upresňujú určité obmedzenia práv používateľov.
+\subsubsection*{Restrictions a AppRestrictions}
+Definujú obmedzenia používateľov do konkrétnych aplikácií.
+
+\subsection{Dátový model aplikácie zberu dát} \label{sub:manage}
+Tento dátový model definuje konkrétnu aplikáciu zberu dát. Daná databáza môže byť spustená na rovnakom serveri, ako je hlavný server systému Sensorical (\textit{Auth API}), alebo na ľubovoľnom inom. Pre jasnú identifikáciu sa tieto servery nazývajú \textit{Manage API}. Štruktúra tabuliek, označenie primárnych kľúčov a dátových typov jednotlivých atribútov je zobrazená na obrázku obr. \ref{fig:dbnsoric}.
+\subsubsection*{Štruktúra dátového modelu informačných systémov}
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/nsoric.png}
+    \centering
+    \caption{Entitno-relačný diagram dátového modelu aplikácie zberu dát}
+    \label{fig:dbnsoric}
+\end{figure}
+
+\subsubsection*{Časti dátového modelu aplikácie zberu dát}
+\begin{itemize}
+	\item časť definujúca rozmiestnenie senzorov v oblasti:
+	\begin{itemize}
+	    \item entitné množiny \textbf{Areas, Sectors, Sensors, SensorSectors, GroupViews, }
+	\end{itemize}
+	\item časť pre ukladanie nameraných hodnôt:
+	\begin{itemize}
+	    \item entitné množiny \textbf{MeasuredValues, MeasuredDates},
+	\end{itemize}
+	\item časť s informáciami o senzoroch:
+	\begin{itemize}
+	    \item entitné množiny \textbf{SensorProperties, Types, TypesGroup1, TypesGroup2},
+	\end{itemize}
+	\item časť definujúca používateľov informačného systému:
+	\begin{itemize}
+	    \item entitné množiny \textbf{Users, UserGroups}.
+	\end{itemize}
+\end{itemize}
+
+\subsection*{Časť definujúca používateľov systému}
+K danej aplikácií nemusí mať prístup každý používateľ systému Sensorical.
+\subsubsection*{Users}
+V tejto entitnej množine sú informácie o používateľoch, ktorý majú prístup k danej aplikácii. Na serveri je každému používateľovi vygenerovaný dočasný JWT token, ktorý je používaný v ďalších požiadavkách na server ako autorizačný kľúč.
+\subsubsection*{UserGroups}
+Táto entitná množina definuje práva používateľa.
+
+\subsection*{Časť rozmiestnenia senzorov}
+Umiestnenie meracích zariadení je zabezpečené hierarchickou štruktúrou. Najvyššia časť tejto štruktúry je oblasť (\textit{Areas}). V oblasti sa nachádzajú sektory (\textit{Sectors}), v ktorých sa nachádzajú dané senzory (\textit{Sensors}).
+\subsubsection*{Areas}
+Zoznam všetkých oblastí v konkrétnej aplikácií. Počet oblastí je neobmedzený. Používateľ musí mať definované práva pre prístup k danej oblasti. Tieto práva definuje entitná množina \textit{GroupViews}
+\subsubsection*{Sectors}
+Definuje zoznam všetkých sektorov. Jeden sektor sa môže nachádzať iba v jednej oblasti, ale oblasť môže obsahovať niekoľko sektorov.
+\subsubsection*{Sensors}
+Táto entitná množina definuje zoznam meracích zariadení v danom informačnom systéme.
+\subsubsection*{SensorSectors}
+Upresňuje vzťah medzi entitnými množinami \textit{Sectors} a \textit{Sensors}. Nakoľko do sektoru môže byť umiestnených viacero senzorov a môže sa stať, že jeden senzor je priradený do viacerých sektorov, je tu použitý vzťah M:N.
+
+\subsection*{Časť pre ukladanie nameraných hodnôt}
+Táto časť zabezpečuje ukladanie nameraných hodnôt. Okrem nameraných hodnôt sa ukladá aj dátum a čas merania, ktorý je potrebný kvôli zobrazeniu časovej závislosti.
+\subsubsection*{MeasuredDates}
+V tejto entitnej množine prebieha ukladanie dátumu a času merania. Vďaka tomu možno vidieť, kedy ktoré meranie prebehlo.
+\subsubsection*{MeasuredValues}
+V tejto entitnej množine prebieha ukladanie hodnôt nameraných senzormi. Táto množina je prepojená s množinami \textit{Sensors} a \textit{MeasuredDates}, čo zabezpečuje priradenie hodnoty k senzoru a tiež aj k dátumu a času merania.
+
+\subsection*{Časť s informáciami o senzoroch}
+V tejto časti modelu je definovaná kategorizácia senzorov, ich vlastnosti a typy.
+\subsubsection*{SensorProperties}
+Definícia vlastností meracích zariadení. Každý senzor má svoju maximálnu a minimálnu prípustnú hodnotu. Táto entitná množina slúži pre zobrazenie týchto hodnôt.
+\subsubsection*{Types}
+Určuje typ daného senzora.
+\subsubsection*{TypesGroup1}
+Keďže senzory môžu merať rôzne fyzikálne veličiny, v tejto entitnej množine sú zadefinované všetky fyzikálne jednotky senzorov.
+
+\section{Komunikácia so serverom}\label{API}
+Na komunikáciu so serverom bol použitý dátový prenos s architektúrou klient-server. Jedná sa o dvojvrstvovú architektúru, kde klient obsahuje používateľské rozhranie a aplikačnú logiku, pričom na serveri beží relačná databáza.
+
+K prístupu údajov, ktoré sú na serveri uložené, slúži aplikačné programové rozhranie (REST API) a komunikačný protokol definovaný práve nad týmto API.
+\subsection{Požiadavky posielané na server}
+Požiadavky, ktoré sú aplikáciou odosielané na server musia byť posielané vo formáte JSON.
+\subsubsection*{Údaje, ktoré môžu byť odosielané pre Auth API}
+\begin{itemize}
+\item \textit{login} - prihlasovacie meno používateľa,
+\item \textit{password} - prihlasovacie heslo používateľa,
+\item \textit{company ID} - ID spoločnosti,
+\item \textit{application ID} - ID aplikácie.
+\end{itemize}
+\subsubsection*{Údaje, ktoré môžu byť odosielané pre Manage API}
+\begin{itemize}
+\item \textit{Authorization} 
+\begin{itemize}
+\item v tomto parametri je uvedený JWT token vygenerovaný serverom (viac v kapitole \ref{bezpecnost}),
+\item povinný údaj, ktorý treba uvádzať v každej požiadavke na Manage API,
+\item slúži pre autorizáciu používateľa,
+\end{itemize}
+\item \textit{application}
+\begin{itemize}
+\item názov aplikácie zberu dát,
+\item povinný údaj pri prihlasovaní sa k vybranej aplikácií,
+\end{itemize}
+\item \textit{user-login}
+\begin{itemize}
+\item prihlasovacie meno používateľa
+\end{itemize}
+\item \textit{area/sector/sensor ID}
+\begin{itemize}
+\item ID oblasti/sektoru/senzoru
+\end{itemize}
+\item \textit{interval}
+\begin{itemize}
+\item časový interval pri zobrazovaní nameraných hodnôt vo forme grafu,
+\end{itemize}
+\item \textit{factor}
+\begin{itemize}
+\item doplnenie parametru interval,
+\item je to celé číslo, základná hodnota je 1
+\item slúži pri vysokých intervaloch, server bude posielať iba každú n-tú hodnotu, kde n je práve hodnota parametra factor
+\end{itemize}
+
+\end{itemize}
+\subsection{Odpovede zo servera}\label{serverResponses}
+Odpovede, ktoré aplikácia obdrží zo servera sú tiež vo formáte JSON. Odpovede sa delia na dve fázy.
+\subsubsection*{Prvá fáza: stav}
+Stav definuje úspešnosť alebo neúspešnosť pripojenia (vlastnosť \textit{status})
+Môžu nastať 3 variácie stavov. Stav 200 hovorí o úspešne spracovanej požiadavke.
+\begin{figure}[H]
+\includegraphics[width=0.7\textwidth]{obrazky/response1.png}
+    \centering
+    \caption{Odpoveď 200 zo servera}
+    \label{fig:response1}
+\end{figure}
+
+Stav 4XX je chybový stav. Pri tomto type stavu je chyba na strane klienta (nesprávne prihlasovacie údaje, nesprávna URL adresa, chýbajúci JWT token a podobne). Môže nadobúdať hodnoty od 400 do 499 vrátane (Obr. \ref{fig:response404}).
+
+Stav 5XX je taktiež chybový stav. V tomto prípade je chyba ale na strane servera a nie u klienta. Môže nadobúdať hodnoty od 500 do 599 vrátane (Obr. \ref{fig:response500}).
+\begin{figure}[h!t]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=1]{obrazky/response404.png}
+  \captionof{figure}{Odpoveď 404 zo servera}
+  \label{fig:response404}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=1]{obrazky/response500.png}
+  \captionof{figure}{Odpoveď 500 zo servera}
+  \label{fig:response500}
+\end{minipage}
+\end{figure}
+\subsubsection*{Druhá fáza: konkrétne hodnoty}
+Ak bola posielaná požiadavka úspešná (status: 200), potom druhá fáza odpovede zo serveru obsahuje konkrétne hodnoty, ktoré boli v požiadavke zažiadané.
+\begin{figure}[h!t]
+\includegraphics[width=0.9\textwidth]{obrazky/response2.png}
+    \centering
+    \caption{Odpoveď obsahujúca konkrétne hodnoty}
+    \label{fig:response2}
+\end{figure}

@@ -1,0 +1,127 @@
+\chapter{Nástroje použité na vývoj}
+Vo vývoji aplikácie eAurela boli použité viaceré nástroje. Keďže má byť aplikácia eAurela dostupná na platformách Windows, Linux, Mac OS a aj ako internetová aplikácia (nefunkčná požiadavka R01), je naprogramovaná pomocou dvoch javascriptových frameworkov: \textit{React.js} a \textit{Electron.js}. Keďže je Electron postavený na \textit{Node.js}, bolo počas vývoja potrebné použiť aj toto javascriptové behové prostredie.
+
+\section{Framework React.js} \label{sec:IntroToReact}
+React je javascriptová knižnica s otvoreným zdrojovým kódom (open-source) od spoločnosti Facebook. Slúži na tvorbu používateľského rozhrania (UI). Od rôznych iných javascriptových frameworkov sa React odlišuje tým, že sa sústredí iba na jednu špecifickú oblasť a tvorí iba vrstvu pohľadu (view), ktorá prezentuje dáta používateľovi.
+Jednou z najväčších výhod Reactu je, že povoluje JSX syntax. Táto syntax je rozšírením javascriptu a umožňuje nám písať HTML kód priamo do javascriptového kódu, čo zjednodušuje celý proces \cite{JSX}.
+Základným stavebným prvkom React aplikácie sú tzv. komponenty (components). Komponenty sú rôzne znovu použiteľné JSX elementy so zapuzdrenou funkcionalitou. Ich skladaním vzniká komplexná UI aplikácia. Tieto komponenty majú svoje vlastnosti (props) a spravujú svoj vnútorný stav (state). Tento spôsob práce s dátami vedie k viac predvídateľnému správaniu a aj ľahšiemu ladeniu. React je možné používať aj s ďalšími podobne zameranými knižnicami, ako je napríklad Redux, alebo Electron \cite{React}.
+\subsection{Komponenty a vlastnosti}
+Komponenty nám umožňujú rozdeliť používateľské rozhranie na nezávislé, znovu použiteľné časti. Koncepčne sú ako javascriptové funckie. Prijímajú ľubovoľné vstupy (props) a vracajú reactové elementy, popisujúce, čo by sa malo zobraziť na obrazovke. Komponenty môžu byť funkcionálne alebo triedne.
+\subsubsection*{Funkcionálne komponenty}
+Najjednoduchší spôsob, ako zadefinovať komponent, je napísať javascriptovú funkciu (viď kód \ref{functionalComponent}).
+\begin{lstlisting}[caption={Príklad funkcionálneho komponentu \cite{ReactComponentsAndProps}}, label={functionalComponent}]
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+\end{lstlisting}
+
+Táto funckia je plnohodnotný komponent, pretože prijíma vlastnosť (props ako properties) s dátami a vracia reactový element.
+\subsubsection*{Triedny komponent}
+Pre zadefinovanie komponentu sa môže taktiež použiť trieda z ES6 (verzia javascriptu ECMAScript 6).
+\begin{lstlisting}[caption={Príklad triedneho komponentu \cite{ReactComponentsAndProps}}, label={classComponent}]
+class Welcome extends React.Component {
+  render() {
+    return <h1>Hello, {this.props.name}</h1>;
+  }
+}
+\end{lstlisting}
+Takto zadefinovaný komponent je rovnaký ako uvedený funkcionálny komponent v kóde \ref{functionalComponent}.
+\subsubsection*{Vykreslenie komponentu}
+Spomenuté elementy, popisujúce čo by sa malo na obrazovke vykresliť môžu byť buď reactové elementy, ktoré reprezentujú DOM (Document Object Model) značky (tagy). Každopádne elementy môžu reprezentovať aj používateľom zadefinované komponenty \cite{ReactComponentsAndProps}. 
+\begin{lstlisting}[caption={Dom tag a používateľom definovaný komponent} \cite{ReactComponentsAndProps}, label={elements}]
+// DOM tag
+const element = <div />; 
+// používateľom definovaný komponent
+const element = <Welcome name="Sara" />; 
+\end{lstlisting}
+Keď React uvidí element reprezentujúci používateľom zadefinovaný komponent, podá tomuto komponentu JSX atribúty a všetkých potomkov ako jeden objekt. Tento objekt sa nazýva \textit{props} (vlastnosti). React sa ku komponentom začínajúcim malým písmenom správa ako k DOM značkám (napríklad <div /> reprezentuje HTML div tag). Používateľom definovaný komponent musí začínať veľkým písmenom. Je to z toho dôvodu, že React predáva tieto elementy metóde \textit{React.createElement(parameter)}. V prípade, že sa jedná o element začínajúci malým písmenom, tejto metóde sa ako parameter podá názov elementu ako textový reťazec. Ak element začína veľkým písmenom, tejto metóde sa podá celý komponent ako objekt \cite{ReactJSXinDepth}. 
+\subsubsection*{Vlastnosti v komponentoch}
+Konfiguráciu a predávanie dát do komponentu majú na starosti vlastnosti (props). Vlastnosti sú dáta určené iba na čítanie (read-only). Či je komponent definovaný ako trieda alebo funkcia, nikdy nesmie modifikovať a meniť hodnotu vlastnostiam. Funkcie, ktoré nikdy neprepisujú svoje vstupné parametre sa nazývajú čisté (pure) funkcie. Takáto funkcia vráti pri rovnakom vstupe vždy ten istý výsledok. Opakom takejto funkcie je funkcia nečistá (impure), ktorá môže meniť svoj vstup. Všetky reactové komponenty sa musia správať ako čisté funkcie vzhľadom na ich vlastnosti \cite{ReactComponentsAndProps}.
+\subsection{Stav aplikácie}
+Stav (state) je podobný vlastnostiam. Používa sa ale výhradne vo vnútri komponentu pre riadenie toku dát. Sú to teda privátne dáta komponentu. Stav sa deklaruje v konštruktore triedneho komponentu. V konštruktore sa nastaví počiatočný stav, ktorý môže byť počas behu aplikácie menený. Pre zmenu stavu sa používa metóda \textit{setState()}, a teda stav nikdy nie je menený priamo.
+\begin{lstlisting}[caption={Aktualizovanie stavu} \cite{ReactStateLifecycle}, label={setState}]
+// Wrong
+this.state.comment = 'Hello';
+// Correct
+this.setState({ comment: 'Hello' });
+\end{lstlisting}
+Výraz \textit{this.state} môže byť pre nastavenie stavu použitý iba v konštruktore komponentu. Aktualizovanie stavu spolu s vlastnosťami môže byť asynchrónne, a preto by sa nemalo spoliehať na ich hodnoty pre výpočet nového stavu. Aby sa zabránilo tomuto správaniu, používa sa druhý spôsob zápisu metódy \textit{setState}, ktorý prijíma funkciu a nie objekt. Táto funkcia dostane ako prvý parameter predchádzajúci stav a ako druhý parameter dostane vlastnosť, v čase kedy je vykonaná aktualizácia. V kóde \ref{setStateFunction} je použitá šípková funkcia, každopádne to tiež správne funguje s regulárnou funkciou \cite{ReactStateLifecycle}.
+\begin{lstlisting}[caption={Použitie šípkovej funkcie vo vnútri setState \cite{ReactStateLifecycle}}, label={setStateFunction}]
+this.setState((state, props) => ({
+  counter: state.counter + props.increment
+}));
+\end{lstlisting}
+
+\section{Framework Electron.js}
+Electron je open-source projekt, ktorý slúži na vývoj a implementáciu multiplatformných desktopových aplikácií. Aplikácie naprogramované pomocou Electronu sú kompatibilné s operačnými systémami Mac, Windows a Linux.
+
+Electron používa Chromium, čo je open-source verzia prehliadača Google Chrome. Ďalej používa Node.js, čo umožňuje vyvíjať desktopové aplikácie pomocou HTML, CSS a javascriptu. V tomto frameworku sú naprogramované populárne aplikácie, ako napríklad Visual Studio Code, Atom editor, Discord a mnoho ďalších.
+
+\subsection{Vývoj Electron aplikácie}
+
+Pokiaľ ide o vývoj, Electron aplikácia je v podstate Node.js aplikácia. Východiskovým súborom je \textit{package.json}, ktorý je totožný s východiskovým modulom Node.js. Súbor \textit{package.json} obsahuje informácie o hlavnom procese a taktiež všetky závislosti aplikácie.
+
+\begin{lstlisting}[caption={Vzor súboru package.json},label={lst:package}]
+{
+  "name": "eaurela",
+  "version": "0.1.0",
+  "main": "./main.js",
+  "private": true,
+  "dependencies": {
+    "react": "^16.12.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "electron-win": "set ELECTRON_DISABLE_SECURITY_WARNINGS=true && set ELECTRON_START_URL=http://localhost:3000/ && electron .",
+    "dev-win": "concurrently -k \"npm start\" \"wait-on http://localhost:3000 && npm run electron-win\"",
+    "package-win": "electron-packager . --platform=win32 --arch=x64"
+   },
+   },
+  "devDependencies": {
+    "concurrently": "^5.0.0",
+    "electron": "^9.0.0",
+    "wait-on": "^3.3.0"
+  }
+}
+\end{lstlisting}
+Súbor \textit{package.json} je vlastne javascriptový objekt, pričom jednotlivé vlastnosti musia byť v úvodzovkách. Skladá sa z viacerých častí. Prvok \textit{"name"} je názov aplikácie, \textit{"version"} hovorí o verzii aplikácie. Jedna z najdôležitejších vlastností je \textit{"main"}. Tá odkazuje na hlavný proces, ktorý sa spustí pri spustení aplikácie. Ďalšie dôležité prvky sú \textit{"dependencies"} a \textit{"scripts"}. Dependencies hovoria o nainštalovaných knižniciach a ich verziách. Scripts sú skripty dôležité napríklad pre spúšťanie, testovanie alebo buildovanie aplikácie (buildovanie aplikácie je popísané v časti \ref{build}). Skripty sa spúšťajú z príkazového riadku (respektíve terminálu) pomocou príkazu \textit{npm} (node package manager). Vlastnosť \textit{"devDependencies"} hovorí o nainštalovaných závislostiach dostupných iba vo fáze vývoja aplikácie.
+
+\subsection{Procesy Electron aplikácie} \label{procesy}
+Electron aplikácia má viacero procesov. Hlavný proces (main process) má na starosti prácu so súbormi, komunikáciu s operačným systémom. 
+
+Vykreslovacie procesy (renderer processes) vytvárajú obsah aplikácie v oknách prehliadača.
+
+V Electron aplikácií, súbor \textit{package.json} spustí hlavný skript nazývaný hlavný proces. V našom prípade sa hlavný proces nazýva \textit{main.js} a nachádza sa v rovnakom priečinku ako súbor \textit{package.json} (viď kód \ref{lst:package}, vlastnosť \textit{"main"}). Skript, ktorý beží v hlavnom procese môže zobrazovať grafické programové rozhranie (Graphical User Interface) vytváraním webových stránok. Electron aplikácia má vždy práve jeden hlavný proces.
+
+Nakoľko Electron používa Chromium pre zobrazovanie webových stránok, jeho viac procesová architektúra je tiež použitá. Každá webová stránka v Electron aplikácií spúšťa jej vlastný proces. Tento proces sa nazýva vykresľovací proces.
+\subsubsection*{Modul BrowserWindow a rozdiel medzi hlavným a vykresľovacím procesom}
+Modul BrowserWindow nám umožňuje vytvoriť nové okno prehliadača, alebo spravovať už existujúce okno. Každé okno prehliadača je separátny proces - vykresľovací proces.
+
+Hlavný proces vytvára webové stránky vytváraním \textit{BrowserWindow} inštancií. V každej inštancií \textit{BrowserWindow} beží webová stránka vo svojom vlastnom vykresľovacom procese.
+
+Hlavný proces spravuje všetky webové stránky a ich korešpondujúce vykresľovacie procesy. Každý vykresľovací proces je izolovaný a stará sa iba o webovú stránku bežiacu v ňom \cite{ElectronProcesses}.
+
+\begin{lstlisting}[caption={Vytvorenie inštancie BrowserWindow v hlavnom procese main.js},label={lst:BrowserWindow}]
+const electron = require('electron');
+const { app, BrowserWindow} = electron;
+let mainWindow;
+const createWindow = () =>
+{
+  mainWindow = new BrowserWindow({
+    width: 1250,
+    height: 750,
+    title: "eAurela",
+    resizable: true,
+   });
+app.on('ready', createWindow);
+\end{lstlisting}
+Hlavný proces \textit{main.js} by mal vytvárať všetky okná a mal by obsluhovať všetky systémové udalosti, ktoré sa v aplikácií môžu vyskytnúť, napríklad vytvorenie okna, ak je obsah aplikácie načítaný \cite{BrowserWindow} (viď kód \ref{lst:BrowserWindow}).
+
+
+
+
+
+
+
+
