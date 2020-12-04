@@ -24,45 +24,14 @@ Ako to už v informatike býva, existuje viacero spôsobov komunikácie. Sú to:
 \end{itemize}
 
 \subsubsection*{Jednoduché API}
-Jednoduché API zvyčanjne ponúkajú iba nejaký zoznam dát k stiahnutiu, napríklad počasie podľa mesta, ale neumožňujú zložitejšiú manipuláciu s dátami. Príklad výstupu jednoduchého API, ktoré je populárne medzi českými e-shopmi, ktoré beží na stránkach Češkej národnej banky na adrese \url{https://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt} je možné vidieť v kóde nižšie.
+Jednoduché API zvyčanjne ponúkajú iba nejaký zoznam dát k stiahnutiu, napríklad počasie podľa mesta, ale neumožňujú zložitejšiú manipuláciu s dátami. Príklad výstupu jednoduchého API, ktoré je populárne medzi českými e-shopmi, ktoré beží na stránkach Českej národnej banky na adrese \url{https://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt} je možné vidieť na obrázku \ref{fig:SimpleAPI}.
 
-\begin{lstlisting}[caption={Výstup API vo formáte CSV \cite{WebAPI}}, label={lst:CSVAPI}]
-27.11.2020 #229
-země|měna|množství|kód|kurz
-Austrálie|dolar|1|AUD|16,203
-Brazílie|real|1|BRL|4,097
-Bulharsko|lev|1|BGN|13,405
-Čína|žen-min-pi|1|CNY|3,344
-Dánsko|koruna|1|DKK|3,523
-EMU|euro|1|EUR|26,220
-Filipíny|peso|100|PHP|45,700
-Hongkong|dolar|1|HKD|2,838
-Chorvatsko|kuna|1|HRK|3,470
-Indie|rupie|100|INR|29,698
-Indonesie|rupie|1000|IDR|1,561
-Island|koruna|100|ISK|16,491
-Izrael|nový šekel|1|ILS|6,629
-Japonsko|jen|100|JPY|21,105
-Jižní Afrika|rand|1|ZAR|1,435
-Kanada|dolar|1|CAD|16,920
-Korejská republika|won|100|KRW|1,989
-Maďarsko|forint|100|HUF|7,236
-Malajsie|ringgit|1|MYR|5,404
-Mexiko|peso|1|MXN|1,095
-MMF|ZPČ|1|XDR|31,346
-Norsko|koruna|1|NOK|2,483
-Nový Zéland|dolar|1|NZD|15,424
-Polsko|zlotý|1|PLN|5,838
-Rumunsko|leu|1|RON|5,380
-Rusko|rubl|100|RUB|28,821
-Singapur|dolar|1|SGD|16,433
-Švédsko|koruna|1|SEK|2,578
-Švýcarsko|frank|1|CHF|24,221
-Thajsko|baht|100|THB|72,548
-Turecko|lira|1|TRY|2,810
-USA|dolar|1|USD|21,993
-Velká Británie|libra|1|GBP|29,312
-\end{lstlisting}
+\begin{figure}[H]
+\includegraphics[width=0.5\textwidth]{obrazky/Simple_WebService.png}
+    \centering
+    \caption{API vo formáte CSV zo stránky Českej národnej banky zo dňa 04.12.2020}
+    \label{fig:SimpleAPI}
+\end{figure}
 
 \subsubsection*{SOAP} \label{soapRef}
 Skratka SOAP znamená \textit{Simple Object Access Protocol}. Správy posielané pomocou protokolu SOAP sú obvykle založené na XML (značkovací jazyk, ktorý je podobný jazyku HTML). Oproti REST je SOAP skôr procedurálny (REST sa orientuje na dáta). To sa prejavuje aj v spôsobe volania - URL adresa pri používaní SOAP bude typicky obsahovať nejaké sloveso, na rozdiel od REST, kde bude typicky podstatné meno.

@@ -7,3 +7,43 @@ Neskôr začali prehliadače podporovať aj typ \textit{multipart/form-data}, kt
 
 S príchodom jazyka \textit{XML} bolo iba otázkou času, než niekoho napadlo posielať si metódou \textit{POST} dáta v \textit{XML}. \textit{XML} umožňuje zapísať lubovoľne zložité štruktúrované dáta do textového súboru platformovo nezávislým zbôsobom. Výhoda je, že sa predávané dáta nemusia obmedzovať na text, ale je možné predávať si zložité objekty a aj kolekcie objektov \cite{WebServicesIntro}.
 
+\section{Popis protokolu SOAP}
+Ako bolo spomenuté vyššie, protokol SOAP je flexibilný, nezávislý na platforme, v ktorom sa komunikujúce strany považujú za rovnocenné. Delia sa iba podľa príznaku \textit{klient-server}. Skladá sa z niekoľkých častí:
+\begin{itemize}
+\item prvá časť: obálka (envelope):
+\begin{itemize}
+\item popisuje obsah správy,
+\item obsahuje niekoľko parametrov na vysvetlenie toho, ako sa má príjemca správať pri spracúvaní obálky,
+\end{itemize}
+\item druhá časť: obsahuje pravidlá, ako sa majú kódovať jednotlivé inštancie dátových typov,
+\item posledná časť:
+\begin{itemize}
+\item popis nasadenia obálky,
+\item pravidlá kódovania dátových typov na reprezentáciu RPC (Remote procedure call) volaní a odpovedí využívajúc protokol HTTP.
+\end{itemize}
+\end{itemize}
+
+SOAP ale nie je odkázaný iba na HTTP. Môže použiť hociaký transportný protokol (napríklad SMTP a i.), stačí, že ho podporuje implementácia SOAP. Dnes už existuje mnoho implementácií SOAP, napríklad to sú \textbf{SOAP:Lite} pre \textit{PERL}, \textbf{Apache Axis} a \textbf{Apache SOAP 2} pre \textit{Java}, tiež existujú implementácie pre jazyk \textit{C\#}, \textit{Delphi}, \textit{Visual Basic} atď \cite{Implementations}.
+\begin{figure}[H]
+\includegraphics[width=1\textwidth]{obrazky/SOAP_preview.png}
+    \centering
+    \caption{SOAP správa s použitím HTTP protokolu \cite{Description}}
+    \label{fig:SOAP-HTTP}
+\end{figure}
+
+Ako je možné vidieť na obrázku \ref{fig:SOAP-HTTP}, prvé 4 riadky sú štandartné parametre protokolu HTTP. Používa sa HTTP metóda \textit{POST} a využíva sa HTTP verzia 1.0 (prvý riadok), volá sa host www.mindstrm.com a používané kódovanie je XML (Content-Type). Content-Length je informácia o dĺžke správy. Piaty riadok obsahuje parameter \textit{SOAPAction}, ktorý už je špecifický pre protokol SOAP. Ten príjemcovi hovorí, čo je obsahom správy. Tento parameter je zavedený iba za účelom šetrenia času, čiže ak príjemca po skontrolovaní parametru SOAPAction zistí, že túto požiadavku nemôže spracovať, nemusí ju zbytočne parsovať. Samotná SOAP požiadavka obsahuje tagy \textit{Envelope}, \textit{Header} (tento tag v obrázku nie je uvedený) a \textit{Body}.
+
+\subsubsection*{Envelope}
+Envelope je párový tag, ktorý zabaľuje celú správu. Tento tag obsahuje \textit{Namespace-y} prislúchajúce protokolu SOAP. Pre SOAP verzie 1.1 je to \url{http://schemas.xmlsoap.org/soap/envelope}. Pre SOAP verzie 1.2 zase \url{http://www.w3.org/2001/12/soap-envelope}. Zvyknú sa tu ešte definovať Namespace-y pre xml-schému a xml-encoding.
+
+\subsubsection*{Header}
+Je voliteľný tag, ktorý definuje správanie príjemcu. V prípade, že \textit{Header} tag nie je vynechaný, je to prvý priamy potomok tagu Envelope. Zvyčajne sa používa pre definovanie parametrov pre prihlásenie, transakcie, a podobne. Potomkovia tagu \textit{Header} môžu použiť 2 parametre: \textit{Actor} a \textit{MustUnderstand}.
+\begin{itemize}
+\item Actor definuje príjemcu správy. Ak je príjemca iný, nesmie správu použiť a musí zahodiť príslušný Header subelement. Používa sa to na komunikáciu s nejakou medzistanicou.
+\item MustUnderstand hovorí, že ak v priebehu spracovania sa nepodarilo pochopiť ľubovoľný z prvkov, tak sa musí odpovedať špecifickou chybou pre SOAP, tzv. \textit{SOAP fault}.
+\end{itemize}
+
+\subsubsection*{Body}
+Body tag obsahuje informáciu o volaných rozhraniach. Jednotlivé subelementy volajú príslušné metódy a vnútri obsahujú príslušné parametre volania s ich udaným typom (v prípade, že to je požadované) \cite{Description}.
+
+
