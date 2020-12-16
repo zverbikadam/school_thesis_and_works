@@ -2,23 +2,23 @@
 
 Klientská aplikácia pre zobrazenie dát ako súčasť senzorického informačného systému
 
-# Thesis
+## Thesis
 
 Client application for data visualization as a part of sensory information system
 
-# Abstrakt
+## Abstrakt
 
 Zverbík, Adam: Klientská aplikácia pre zobrazenie dát ako súčasť senzorického infor-mačného systému. [Bakalárska práca]. – Slovenská technická univerzita. Materiálovo-technologická fakulta; Ústav aplikovanej informatiky automatizácie a mechatroniky. –Vedúci práce: Ing. Juraj Ďuďák, PhD. – MTF STU, 2020, 57s.
 
 Cieľom záverečnej práce je vyvinúť a implementovať multiplatformnú desktopovúaplikáciu a web aplikáciu. Výsledkom tejto práce je funkčná klientská aplikácia prezobrazenie dát a spravovanie senzorického informačného systému Sensorical. V prvejkapitole je opísaný systém Sensorical, jeho dátový model a komunikácia so serverom.Druhá kapitola sa venuje analýze požiadaviek a štruktúre aplikácie. V tretej kapitole súpopísané nástroje, ktoré boli použité pri vývoji aplikácie. Štvrtá kapitola pojednáva oimplementácií a piata kapitola je venovaná buildovaniu aplikácie.
 
-# Abstract
+## Abstract
 
 Zverbík, Adam: Client application for data visualization as a part of sensory informationsystem. [Bachelor thesis]. – Slovak University of Technology. Faculty of Materials Scienceand Technology; Institute of Applied Informatics, Automation and Mechatronics. –Thesis supervisor: Ing. Juraj Ďuďák, PhD. – MTF STU, 2020, 57p.
 
 The aim of the bachelor thesis is to develop and implement multiplatform desktopapplication and web application. The result of this thesis is functional client application,which shows and manages data of the sensoric information system Sensorical. Datamodel of sensorical system and communication with server is described in the firstchaper. The second chapter is dedicated to analyze requirements and structure of theapplication. The tools used in development process are described in the third chapter.The fourth chapter is about implementation and the fifth chapter describes building ofthe final application.
 
-## kľúčové slová (keywords)
+### kľúčové slová (keywords)
 
 desktopová aplikácia, web aplikácia, React, Electron, senzorický informačný systém 
 
@@ -28,7 +28,7 @@ desktopová aplikácia, web aplikácia, React, Electron, senzorický informačn�
 # Preview of React application developed within practical part
 
 
-# Description
+## Description
 
 This app is developed using combination of 2 JavaScript frameworks, React.js and Electron.js. It is not done yet, there are still functionalities missing at backand side as well as in client side. 
 
@@ -51,9 +51,9 @@ After successful login to information system, users can view measured sensoric d
 
 They can view charts from 1 day, 1 week or 1 month. Data are measured and sent to server every 5 minutes (when there is no problem).
 
-# Screenshot with comments
+## Screenshot with comments
 
-## Login screen
+### Login screen
 
 Login screen is the first screen after application launch.
 
@@ -61,7 +61,7 @@ Login screen is the first screen after application launch.
 
 Fig.1: Login 
 
-## Applist screen
+### Applist screen
 
 After successful login, users see companies and company applications. They see only those applications, they have access to.
 
@@ -69,7 +69,7 @@ After successful login, users see companies and company applications. They see o
 
 Fig. 2: Companies and their applications
 
-## AuthAdmin screen
+### AuthAdmin screen
 
 Auth API administrators can manage this API too.
 
@@ -77,7 +77,7 @@ Auth API administrators can manage this API too.
 
 Fig. 3: Auth API administration
 
-## Sectors screen - last measured value
+### Sectors screen - last measured value
 
 When user choose company's application, they see last measured value from sensors in area's sector. They can switch between sectors and areas and view data from sensors in different location.
 
@@ -85,7 +85,7 @@ When user choose company's application, they see last measured value from sensor
 
 Fig. 4: last measured values from sensors
 
-## Sectors screen - values rendered in chart
+### Sectors screen - values rendered in chart
 
 Users can display line chart, that contains values that were measured during 1 day, 1 week or 1 month. `Recharts` library was used to render charts.
 
@@ -93,7 +93,7 @@ Users can display line chart, that contains values that were measured during 1 d
 
 Fig. 5: Data from 1 month displayed in line chart
 
-## ManageAdmin screen
+### ManageAdmin screen
 
 Administrators of current application can manage that database as well.
 
@@ -101,7 +101,7 @@ Administrators of current application can manage that database as well.
 
 Fig. 6: Manage API administration
 
-## Building
+### Building
 
 To build react side of the application was used reacts
 ```
